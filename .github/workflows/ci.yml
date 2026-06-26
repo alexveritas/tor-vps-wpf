@@ -45,22 +45,63 @@ jobs:
             --self-contained true -p:PublishSingleFile=true `
             -o ./publish
 
-      - name: Scope guard
+      - name: Scope guard + Protected modules check
         shell: pwsh
         run: |
           $changed = git diff --name-only origin/main...HEAD
           Write-Host "=== Changed files ==="
           $changed | ForEach-Object { Write-Host "  $_" }
 
+          # ── Бинарники никогда ───────────────────────────────────────────
           $bins = $changed | Where-Object { $_ -match '\.(exe|dll|zip|nupkg)$' }
           if ($bins) {
-            Write-Error "Binary files in commit — add to .gitignore: $($bins -join ', ')"
+            Write-Error "Binary files in commit - add to .gitignore: $($bins -join ', ')"
             exit 1
           }
 
-          $wf = $changed | Where-Object { $_ -match '^\.github/workflows/' }
-          if ($wf) {
-            Write-Warning "Workflow files changed — review carefully: $($wf -join ', ')"
+          # ── Защита готовых модулей ──────────────────────────────────────
+          # Единственное исключение: PR трогает ТОЛЬКО DONE_MODULES.md
+          # (пользователь обновляет список защищённых файлов)
+          $nonListChanges = $changed | Where-Object { $_ -ne "DONE_MODULES.md" }
+          if (-not $nonListChanges) {
+            Write-Host "Only DONE_MODULES.md changed - allowed."
+            exit 0
           }
 
-          Write-Host "Scope guard OK."
+          # Читаем список защищённых файлов
+          $protected = @()
+          if (Test-Path "DONE_MODULES.md") {
+            $protected = Get-Content "DONE_MODULES.md" |
+              Where-Object { $_ -match '^- ' } |
+              ForEach-Object { ($_ -replace '^- ', '').Trim() }
+          }
+
+          if ($protected.Count -gt 0) {
+            Write-Host "=== Protected modules ($($protected.Count)) ==="
+            $protected | ForEach-Object { Write-Host "  $_" }
+          }
+
+          # Проверяем нарушения
+          $violations = $changed | Where-Object { $protected -contains $_ }
+
+          if ($violations) {
+            Write-Host ""
+            Write-Error "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            Write-Error "  PROTECTED FILES MODIFIED"
+            Write-Error "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            Write-Error ""
+            Write-Error "  These files are marked as DONE and cannot be changed:"
+            $violations | ForEach-Object { Write-Error "    $_" }
+            Write-Error ""
+            Write-Error "  To unprotect a file:"
+            Write-Error "  1. Create a NEW separate PR"
+            Write-Error "  2. That PR must ONLY modify DONE_MODULES.md"
+            Write-Error "  3. Remove the file from the list"
+            Write-Error "  4. Merge that PR first, then make changes"
+            Write-Error ""
+            Write-Error "  No bypass commands exist. This is by design."
+            Write-Error "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            exit 1
+          }
+
+          Write-Host "Scope guard OK - no protected files modified."
