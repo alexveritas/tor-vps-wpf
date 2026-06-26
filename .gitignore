@@ -14,3 +14,5 @@ TestResults/
 *.nupkg
 Thumbs.db
 .DS_Store
+
+reference/
