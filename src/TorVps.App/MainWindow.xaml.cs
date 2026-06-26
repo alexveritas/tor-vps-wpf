@@ -1,3 +1,5 @@
+using System.Windows;
+
 namespace TorVps.App;
 
 public partial class MainWindow : Window
