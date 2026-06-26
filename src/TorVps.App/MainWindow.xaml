@@ -1,0 +1,20 @@
+<Window
+    x:Class="TorVps.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="TorVps v0.34"
+    Width="444"
+    Height="562"
+    ResizeMode="NoResize"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None">
+    <Grid Background="#1a1a2e">
+        <TextBlock
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontSize="20"
+            FontWeight="Bold"
+            Foreground="#00d4ff"
+            Text="TorVps — C# WPF" />
+    </Grid>
+</Window>

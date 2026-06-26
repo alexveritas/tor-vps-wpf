@@ -1,0 +1,48 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore TorVps.sln
+
+      - name: Publish
+        run: |
+          dotnet publish src/TorVps.App/TorVps.App.csproj `
+            -c Release -r win-x64 --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:DebugType=none -p:DebugSymbols=false `
+            -o ./publish
+
+      - name: Get version
+        id: ver
+        shell: pwsh
+        run: |
+          $xml = [xml](Get-Content src/TorVps.App/TorVps.App.csproj)
+          $v = ($xml.Project.PropertyGroup | Where-Object {$_.Version} | Select -First 1).Version
+          if (-not $v) { $v = "0.1.0" }
+          echo "VERSION=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Zip
+        shell: pwsh
+        run: |
+          Compress-Archive ./publish/TorVps.exe `
+            -DestinationPath TorVps-${{ steps.ver.outputs.VERSION }}-win-x64.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TorVps-${{ steps.ver.outputs.VERSION }}-win-x64
+          path: TorVps-${{ steps.ver.outputs.VERSION }}-win-x64.zip
+          retention-days: 90

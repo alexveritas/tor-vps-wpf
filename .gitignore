@@ -1,0 +1,16 @@
+bin/
+obj/
+publish/
+.vs/
+*.user
+*.suo
+*.rsuser
+TestResults/
+*.trx
+*.exe
+*.dll
+*.pdb
+*.zip
+*.nupkg
+Thumbs.db
+.DS_Store

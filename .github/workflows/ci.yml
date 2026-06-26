@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore TorVps.sln
+
+      - name: Format check (lint)
+        run: dotnet format TorVps.sln --verify-no-changes --verbosity diagnostic
+
+      - name: Build + typecheck
+        run: dotnet build TorVps.sln --no-restore -c Debug -warnaserror
+
+      - name: Unit tests
+        run: |
+          dotnet test TorVps.sln `
+            --no-build -c Debug `
+            --logger "trx;LogFileName=results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/*.trx"
+
+      - name: Build Release (publish check)
+        run: |
+          dotnet publish src/TorVps.App/TorVps.App.csproj `
+            -c Release --no-restore -r win-x64 `
+            --self-contained true -p:PublishSingleFile=true `
+            -o ./publish
+
+      - name: Scope guard
+        shell: pwsh
+        run: |
+          $changed = git diff --name-only origin/main...HEAD
+          Write-Host "=== Changed files ==="
+          $changed | ForEach-Object { Write-Host "  $_" }
+
+          $bins = $changed | Where-Object { $_ -match '\.(exe|dll|zip|nupkg)$' }
+          if ($bins) {
+            Write-Error "Binary files in commit — add to .gitignore: $($bins -join ', ')"
+            exit 1
+          }
+
+          $wf = $changed | Where-Object { $_ -match '^\.github/workflows/' }
+          if ($wf) {
+            Write-Warning "Workflow files changed — review carefully: $($wf -join ', ')"
+          }
+
+          Write-Host "Scope guard OK."

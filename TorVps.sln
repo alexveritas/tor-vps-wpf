@@ -1,0 +1,34 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34525.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorVps.App", "src\TorVps.App\TorVps.App.csproj", "{13AFDDEB-D90F-4F85-8996-CB772FBC6E63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorVps.Core", "src\TorVps.Core\TorVps.Core.csproj", "{C2F343E5-6CC4-418E-A490-83937956789B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorVps.Tests", "tests\TorVps.Tests\TorVps.Tests.csproj", "{F7439C53-EFE1-47B2-932E-20924A8A52AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13AFDDEB-D90F-4F85-8996-CB772FBC6E63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13AFDDEB-D90F-4F85-8996-CB772FBC6E63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13AFDDEB-D90F-4F85-8996-CB772FBC6E63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13AFDDEB-D90F-4F85-8996-CB772FBC6E63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2F343E5-6CC4-418E-A490-83937956789B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2F343E5-6CC4-418E-A490-83937956789B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2F343E5-6CC4-418E-A490-83937956789B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2F343E5-6CC4-418E-A490-83937956789B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7439C53-EFE1-47B2-932E-20924A8A52AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7439C53-EFE1-47B2-932E-20924A8A52AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7439C53-EFE1-47B2-932E-20924A8A52AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7439C53-EFE1-47B2-932E-20924A8A52AA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
