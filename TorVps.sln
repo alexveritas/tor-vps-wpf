@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorVps.App", "src\TorVps.App\TorVps.App.csproj", "{13AFDDEB-D90F-4F85-8996-CB772FBC6E63}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorVps.App", "src\TorVps.App\TorVps.App.csproj", "{1681C8F9-2B4A-4192-B10F-7987A64B6C22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorVps.Core", "src\TorVps.Core\TorVps.Core.csproj", "{C2F343E5-6CC4-418E-A490-83937956789B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorVps.Core", "src\TorVps.Core\TorVps.Core.csproj", "{03D38552-2CD2-48B0-930E-C449506F5082}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorVps.Tests", "tests\TorVps.Tests\TorVps.Tests.csproj", "{F7439C53-EFE1-47B2-932E-20924A8A52AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TorVps.Tests", "tests\TorVps.Tests\TorVps.Tests.csproj", "{A0D4BB45-E160-4D56-8F3C-CB3D8DF65203}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,18 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{13AFDDEB-D90F-4F85-8996-CB772FBC6E63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13AFDDEB-D90F-4F85-8996-CB772FBC6E63}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13AFDDEB-D90F-4F85-8996-CB772FBC6E63}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13AFDDEB-D90F-4F85-8996-CB772FBC6E63}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C2F343E5-6CC4-418E-A490-83937956789B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2F343E5-6CC4-418E-A490-83937956789B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2F343E5-6CC4-418E-A490-83937956789B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2F343E5-6CC4-418E-A490-83937956789B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7439C53-EFE1-47B2-932E-20924A8A52AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7439C53-EFE1-47B2-932E-20924A8A52AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7439C53-EFE1-47B2-932E-20924A8A52AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7439C53-EFE1-47B2-932E-20924A8A52AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1681C8F9-2B4A-4192-B10F-7987A64B6C22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1681C8F9-2B4A-4192-B10F-7987A64B6C22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1681C8F9-2B4A-4192-B10F-7987A64B6C22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1681C8F9-2B4A-4192-B10F-7987A64B6C22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03D38552-2CD2-48B0-930E-C449506F5082}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03D38552-2CD2-48B0-930E-C449506F5082}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03D38552-2CD2-48B0-930E-C449506F5082}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03D38552-2CD2-48B0-930E-C449506F5082}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0D4BB45-E160-4D56-8F3C-CB3D8DF65203}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0D4BB45-E160-4D56-8F3C-CB3D8DF65203}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0D4BB45-E160-4D56-8F3C-CB3D8DF65203}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0D4BB45-E160-4D56-8F3C-CB3D8DF65203}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
