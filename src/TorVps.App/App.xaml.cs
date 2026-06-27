@@ -26,6 +26,7 @@ public partial class App : Application
         services.AddSingleton<IVpsMonitorService, VpsMonitorService>();
         services.AddSingleton<IMihomoService, MihomoService>();
         services.AddSingleton<ITorService, TorService>();
+        services.AddSingleton<IConfigCheckService, ConfigCheckService>();
         services.AddSingleton<DashboardViewModel>();
         services.AddSingleton<MainWindow>();
 

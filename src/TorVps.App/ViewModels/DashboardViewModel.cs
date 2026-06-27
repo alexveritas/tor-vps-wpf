@@ -27,6 +27,7 @@ public partial class DashboardViewModel : ObservableObject
     private readonly ISocks5Probe _socksProbe;
     private readonly IVpsMonitorService _vpsMonitorService;
     private readonly ILogService _logService;
+    private readonly IConfigCheckService _configCheckService;
     private readonly DispatcherTimer _refreshTimer;
 
     private readonly Queue<GraphHistoryPoint> _graphHistory = new();
@@ -52,7 +53,8 @@ public partial class DashboardViewModel : ObservableObject
         ITorControlClient torControlClient,
         ISocks5Probe socksProbe,
         IVpsMonitorService vpsMonitorService,
-        ILogService logService)
+        ILogService logService,
+        IConfigCheckService configCheckService)
     {
         _torService = torService;
         _mihomoService = mihomoService;
@@ -60,6 +62,7 @@ public partial class DashboardViewModel : ObservableObject
         _socksProbe = socksProbe;
         _vpsMonitorService = vpsMonitorService;
         _logService = logService;
+        _configCheckService = configCheckService;
 
         _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _refreshTimer.Tick += async (_, _) => await RefreshAsync();
@@ -270,6 +273,8 @@ public partial class DashboardViewModel : ObservableObject
 
             ReplaceAll(Bridges, bridgeRecords);
             ReplaceAll(LogLines, logLines);
+            ReplaceAll(Checks, _configCheckService.Run(config));
+            UpdateConfTabStatus();
 
             TunnelOn = torAlive;
             MihomoOn = mihomoAlive;
