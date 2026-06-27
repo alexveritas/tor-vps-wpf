@@ -156,10 +156,13 @@ public partial class DashboardViewModel : ObservableObject
 
     [ObservableProperty] private string _downPeakText = "0.00";
     [ObservableProperty] private string _downCurrentText = "0.00";
+    [ObservableProperty] private string _downAverageText = "0.00";
     [ObservableProperty] private string _upPeakText = "0.00";
     [ObservableProperty] private string _upCurrentText = "0.00";
+    [ObservableProperty] private string _upAverageText = "0.00";
     [ObservableProperty] private string _pingPeakText = "— ms";
     [ObservableProperty] private string _pingCurrentText = "— ms";
+    [ObservableProperty] private string _pingAverageText = "— ms";
 
     [ObservableProperty] private string _vpsCpuText = "0%";
     [ObservableProperty] private string _vpsRamText = "0%";

@@ -65,9 +65,12 @@ public partial class DashboardViewModel
         UpCurrentText = FormatSpeed(lastValid?.Up ?? 0);
         DownPeakText = FormatSpeed(validPoints.Length > 0 ? validPoints.Max(p => p.Down) : 0);
         UpPeakText = FormatSpeed(validPoints.Length > 0 ? validPoints.Max(p => p.Up) : 0);
+        DownAverageText = FormatSpeed(validPoints.Length > 0 ? validPoints.Average(p => p.Down) : 0);
+        UpAverageText = FormatSpeed(validPoints.Length > 0 ? validPoints.Average(p => p.Up) : 0);
 
         PingCurrentText = FormatPing(lastValid?.Ping ?? 0);
         PingPeakText = FormatPing(pingValues.Length > 0 ? pingValues.Max() : 0);
+        PingAverageText = FormatPing(pingValues.Length > 0 ? pingValues.Average() : 0);
 
         var vpsPoints = _vpsHistory.ToArray();
         var validVps = vpsPoints.Where(p => p.Valid).ToArray();
