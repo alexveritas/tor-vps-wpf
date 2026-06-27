@@ -7,14 +7,269 @@
     Height="562"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterScreen"
-    WindowStyle="None">
-    <Grid Background="#1a1a2e">
-        <TextBlock
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            FontSize="20"
-            FontWeight="Bold"
-            Foreground="#00d4ff"
-            Text="TorVps — C# WPF" />
+    WindowStyle="None"
+    Background="{StaticResource WindowBackgroundBrush}"
+    FontFamily="{StaticResource AppFont}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Titlebar -->
+        <Border
+            Grid.Row="0"
+            Background="{StaticResource TitlebarBackgroundBrush}"
+            BorderBrush="{StaticResource TitlebarBorderBrush}"
+            BorderThickness="0,0,0,1"
+            MouseLeftButtonDown="Titlebar_MouseLeftButtonDown">
+            <Grid Margin="12,0,6,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="8" Height="8" Margin="0,0,7,0" Fill="{StaticResource AccentGreenBrush}" />
+                    <TextBlock Text="Tor-vps v0.34" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="—" Style="{StaticResource WindowChromeButtonStyle}" Click="Minimize_Click" />
+                    <Button Content="✕" Style="{StaticResource WindowChromeButtonStyle}" Click="Close_Click" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Toolbar: Main/Conf tabs + Tor/mihomo toggles -->
+        <Grid Grid.Row="1" Margin="14,10,14,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button Content="Main" Style="{StaticResource MainTabButtonStyle}" Command="{Binding ShowMainTabCommand}" Margin="0,0,6,0" />
+                <Button Style="{StaticResource ConfTabButtonStyle}" Command="{Binding ShowConfTabCommand}">
+                    <TextBlock Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
+                        <Run Text="Conf · " /><Run Text="{Binding ConfTabStatusText, Mode=OneWay}" />
+                    </TextBlock>
+                </Button>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Tor" FontSize="11" Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <ToggleButton
+                    Style="{StaticResource BinaryToggleStyle}"
+                    IsChecked="{Binding TunnelOn, Mode=OneWay}"
+                    Command="{Binding ToggleTunnelCommand}"
+                    IsEnabled="{Binding TunnelToggleEnabled}"
+                    Margin="0,0,10,0" />
+                <TextBlock Text="mihomo" FontSize="11" Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <ToggleButton
+                    Style="{StaticResource BinaryToggleStyle}"
+                    IsChecked="{Binding MihomoOn, Mode=OneWay}"
+                    Command="{Binding ToggleMihomoCommand}"
+                    IsEnabled="{Binding MihomoToggleEnabled}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Content: Main or Conf -->
+        <Grid Grid.Row="2" Margin="14,0,14,12">
+
+            <!-- Main tab -->
+            <Grid Visibility="{Binding IsMainTab, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <ItemsControl Grid.Row="0" ItemsSource="{Binding Cards}" Margin="0,0,0,8" Focusable="False">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="1" Columns="5" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="2" Padding="3,6" CornerRadius="8" Background="{Binding State, Converter={StaticResource HealthStateToBackgroundBrushConverter}}">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Text}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"
+                                               Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Border Grid.Row="1" Style="{StaticResource PanelBorderStyle}" Padding="10,8" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="58" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="DOWN Mbit/s" FontSize="8" Foreground="{StaticResource DownSeriesBrush}" />
+                                <TextBlock FontSize="12" FontWeight="Bold" Text="{Binding DownCurrentText, Mode=OneWay}" />
+                                <TextBlock FontSize="8" Foreground="{StaticResource TextMutedBrush}">
+                                    <Run Text="peak " /><Run Text="{Binding DownPeakText, Mode=OneWay}" /><Run Text="  avg " /><Run Text="{Binding DownAverageText, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="UP Mbit/s" FontSize="8" Foreground="{StaticResource UpSeriesBrush}" />
+                                <TextBlock FontSize="12" FontWeight="Bold" Text="{Binding UpCurrentText, Mode=OneWay}" />
+                                <TextBlock FontSize="8" Foreground="{StaticResource TextMutedBrush}">
+                                    <Run Text="peak " /><Run Text="{Binding UpPeakText, Mode=OneWay}" /><Run Text="  avg " /><Run Text="{Binding UpAverageText, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="PING" FontSize="8" Foreground="{StaticResource PingSeriesBrush}" />
+                                <TextBlock FontSize="12" FontWeight="Bold" Text="{Binding PingCurrentText, Mode=OneWay}" />
+                                <TextBlock FontSize="8" Foreground="{StaticResource TextMutedBrush}">
+                                    <Run Text="peak " /><Run Text="{Binding PingPeakText, Mode=OneWay}" /><Run Text="  avg " /><Run Text="{Binding PingAverageText, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                        <Viewbox Grid.Row="1" Stretch="Fill" Margin="0,6,0,0">
+                            <Canvas Width="520" Height="50">
+                                <Polyline Points="{Binding UpAreaPoints}" Stroke="{StaticResource UpSeriesBrush}" StrokeThickness="1.3" />
+                                <Polyline Points="{Binding DownAreaPoints}" Stroke="{StaticResource DownSeriesBrush}" StrokeThickness="1.3" />
+                                <Polyline Points="{Binding PingAreaPoints}" Stroke="{StaticResource PingSeriesBrush}" StrokeThickness="1" Opacity="0.85" />
+                            </Canvas>
+                        </Viewbox>
+                    </Grid>
+                </Border>
+
+                <!-- Lower grid: bridges / health / vps / log -->
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" MinHeight="56" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="104" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Style="{StaticResource PanelBorderStyle}" Padding="8,6" Margin="0,0,0,6">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Bridges}" Focusable="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="2" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Text}" FontSize="9" Margin="2,1" TextTrimming="CharacterEllipsis"
+                                                   Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Border Grid.Row="1" Style="{StaticResource PanelBorderStyle}" Padding="6" Margin="0,0,0,6">
+                        <ItemsControl ItemsSource="{Binding Health}" Focusable="False">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="4" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="2" Padding="3" CornerRadius="6" Background="{Binding State, Converter={StaticResource HealthStateToBackgroundBrushConverter}}">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Label}" FontSize="8" Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" />
+                                            <TextBlock Text="{Binding Text}" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center"
+                                                       Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+
+                    <Border Grid.Row="2" Style="{StaticResource PanelBorderStyle}" Padding="8,6" Margin="0,0,0,6" ToolTip="{Binding ServerTooltip}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="130" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="VPS" FontSize="9" Foreground="{StaticResource TextMutedBrush}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontSize="9" Foreground="{StaticResource CpuSeriesBrush}">
+                                        <Run Text="CPU " /><Run Text="{Binding VpsCpuText, Mode=OneWay}" />
+                                    </TextBlock>
+                                    <TextBlock FontSize="9" Foreground="{StaticResource MemSeriesBrush}" Margin="8,0,0,0">
+                                        <Run Text="RAM " /><Run Text="{Binding VpsRamText, Mode=OneWay}" />
+                                    </TextBlock>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontSize="9" Foreground="{StaticResource DownSeriesBrush}">
+                                        <Run Text="↓ " /><Run Text="{Binding VpsDownCurrentText, Mode=OneWay}" />
+                                    </TextBlock>
+                                    <TextBlock FontSize="9" Foreground="{StaticResource UpSeriesBrush}" Margin="8,0,0,0">
+                                        <Run Text="↑ " /><Run Text="{Binding VpsUpCurrentText, Mode=OneWay}" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+                            <Viewbox Grid.Column="1" Stretch="Fill" Margin="6,0,0,0">
+                                <Canvas Width="260" Height="24">
+                                    <Polyline Points="{Binding VpsUpAreaPoints}" Stroke="{StaticResource UpSeriesBrush}" StrokeThickness="1" />
+                                    <Polyline Points="{Binding VpsDownAreaPoints}" Stroke="{StaticResource DownSeriesBrush}" StrokeThickness="1" />
+                                </Canvas>
+                            </Viewbox>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Padding="8,6">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding LogLines}" Focusable="False">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" FontSize="9" Foreground="{StaticResource TextDimBrush}" TextWrapping="NoWrap" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- Conf tab -->
+            <Grid Visibility="{Binding IsConfTab, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Content="Update rules from mihomo.yaml" Style="{StaticResource ActionButtonStyle}"
+                        Command="{Binding UpdateRulesCommand}" Margin="0,6,0,10" HorizontalAlignment="Center" />
+                <Border Grid.Row="1" Style="{StaticResource PanelBorderStyle}" Padding="10">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Checks}" Focusable="False">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="10" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Detail}" FontSize="10"
+                                                   Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
