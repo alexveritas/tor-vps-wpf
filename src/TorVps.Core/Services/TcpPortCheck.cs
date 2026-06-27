@@ -2,8 +2,8 @@ using System.Net.Sockets;
 
 namespace TorVps.Core.Services;
 
-/// <summary>Shared "is this TCP port accepting connections" probe used by TorService and MihomoService.</summary>
-internal static class TcpPortCheck
+/// <summary>Shared "is this TCP port accepting connections" probe used by TorService, MihomoService, and dashboard status checks.</summary>
+public static class TcpPortCheck
 {
     public static async Task<bool> IsOpenAsync(string host, int port, int timeoutMs, CancellationToken cancellationToken = default)
     {

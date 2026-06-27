@@ -1,7 +1,42 @@
+using System.Net.Http;
 using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using TorVps.App.ViewModels;
+using TorVps.Core.Interfaces;
+using TorVps.Core.Services;
 
 namespace TorVps.App;
 
 public partial class App : Application
 {
+    private const string BaseDirectory = @"C:\tor";
+    private ServiceProvider? _serviceProvider;
+
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+
+        var services = new ServiceCollection();
+        services.AddSingleton(new HttpClient());
+        services.AddSingleton<ILogService, LogService>();
+        services.AddSingleton<IProcessManager, ProcessManager>();
+        services.AddSingleton<IWindowsProxyService, WindowsProxyService>();
+        services.AddSingleton<ISocks5Probe, Socks5Probe>();
+        services.AddSingleton<ITorControlClient, TorControlClient>();
+        services.AddSingleton<IVpsMonitorService, VpsMonitorService>();
+        services.AddSingleton<IMihomoService, MihomoService>();
+        services.AddSingleton<ITorService, TorService>();
+        services.AddSingleton<DashboardViewModel>();
+        services.AddSingleton<MainWindow>();
+
+        _serviceProvider = services.BuildServiceProvider();
+        _serviceProvider.GetRequiredService<ILogService>().Initialize(BaseDirectory);
+        _serviceProvider.GetRequiredService<MainWindow>().Show();
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _serviceProvider?.Dispose();
+        base.OnExit(e);
+    }
 }

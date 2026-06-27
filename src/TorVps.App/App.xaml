@@ -2,6 +2,16 @@
     x:Class="TorVps.App.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    StartupUri="MainWindow.xaml">
-    <Application.Resources />
+    xmlns:converters="clr-namespace:TorVps.App.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Theme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:HealthStateToBackgroundBrushConverter x:Key="HealthStateToBackgroundBrushConverter" />
+            <converters:HealthStateToForegroundBrushConverter x:Key="HealthStateToForegroundBrushConverter" />
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>

@@ -1,0 +1,163 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <FontFamily x:Key="AppFont">Segoe UI Variable Text, Segoe UI</FontFamily>
+
+    <LinearGradientBrush x:Key="WindowBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#0D0D10" Offset="0" />
+        <GradientStop Color="#070709" Offset="1" />
+    </LinearGradientBrush>
+
+    <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="#F5F5F7" />
+    </Style>
+
+    <SolidColorBrush x:Key="TitlebarBackgroundBrush" Color="#0F1117" />
+    <SolidColorBrush x:Key="TitlebarBorderBrush" Color="#1FFFFFFF" />
+    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#DC1C1C1E" />
+    <SolidColorBrush x:Key="PanelBorderBrush" Color="#16FFFFFF" />
+    <SolidColorBrush x:Key="ChartPanelBackgroundBrush" Color="#FF121216" />
+    <SolidColorBrush x:Key="ToggleTrackBrush" Color="#FF111114" />
+    <SolidColorBrush x:Key="ToggleBorderBrush" Color="#1FFFFFFF" />
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#A1A1A8" />
+    <SolidColorBrush x:Key="TextDimBrush" Color="#9EB4D3" />
+
+    <SolidColorBrush x:Key="AccentGreenBrush" Color="#30D158" />
+    <SolidColorBrush x:Key="AccentYellowBrush" Color="#FFD60A" />
+    <SolidColorBrush x:Key="AccentRedBrush" Color="#FF453A" />
+    <SolidColorBrush x:Key="AccentGrayBrush" Color="#A1A1A8" />
+    <SolidColorBrush x:Key="AccentBlueBrush" Color="#0A84FF" />
+    <SolidColorBrush x:Key="OnDarkTextBrush" Color="#03110A" />
+
+    <SolidColorBrush x:Key="DownSeriesBrush" Color="#74F59A" />
+    <SolidColorBrush x:Key="UpSeriesBrush" Color="#40C8FF" />
+    <SolidColorBrush x:Key="PingSeriesBrush" Color="#FF6969" />
+    <SolidColorBrush x:Key="CpuSeriesBrush" Color="#FFE4C4" />
+    <SolidColorBrush x:Key="MemSeriesBrush" Color="#BF5AF2" />
+
+    <!-- Generic rounded panel used for chart/bridge/health/server/log blocks -->
+    <Style x:Key="PanelBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource PanelBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource PanelBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="14" />
+    </Style>
+
+    <Style x:Key="WindowChromeButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="#B5C5DF" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#1AFFFFFF" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- "off / On" pill switch used for the Tor and mihomo toggles -->
+    <Style x:Key="BinaryToggleStyle" TargetType="ToggleButton">
+        <Setter Property="Width" Value="82" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border Background="{StaticResource ToggleTrackBrush}" BorderBrush="{StaticResource ToggleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="3">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="OffPill" Grid.Column="0" CornerRadius="11" Margin="0,0,1,0" Background="Transparent">
+                                <TextBlock x:Name="OffText" Text="off" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="#B8C6D9" />
+                            </Border>
+                            <Border x:Name="OnPill" Grid.Column="1" CornerRadius="11" Margin="1,0,0,0" Background="Transparent">
+                                <TextBlock x:Name="OnText" Text="On" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="#B8C6D9" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="OnPill" Property="Background" Value="{StaticResource AccentGreenBrush}" />
+                            <Setter TargetName="OnText" Property="Foreground" Value="{StaticResource OnDarkTextBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter TargetName="OffPill" Property="Background" Value="{StaticResource AccentGreenBrush}" />
+                            <Setter TargetName="OffText" Property="Foreground" Value="{StaticResource OnDarkTextBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.56" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Main/Conf tab strip buttons -->
+    <Style x:Key="TabButtonBaseStyle" TargetType="Button">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="MinWidth" Value="58" />
+        <Setter Property="Padding" Value="13,0" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Background" Value="#FF1B212C" />
+        <Setter Property="Foreground" Value="#9AA4B5" />
+        <Setter Property="BorderBrush" Value="#1AFFFFFF" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="15">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ActionButtonStyle" TargetType="Button" BasedOn="{StaticResource TabButtonBaseStyle}">
+        <Setter Property="Background" Value="{StaticResource AccentGreenBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource OnDarkTextBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource AccentGreenBrush}" />
+        <Setter Property="MinWidth" Value="210" />
+    </Style>
+
+    <Style x:Key="MainTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabButtonBaseStyle}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsMainTab}" Value="True">
+                <Setter Property="Background" Value="{StaticResource AccentBlueBrush}" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ConfTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabButtonBaseStyle}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsMainTab}" Value="False">
+                <Setter Property="Background" Value="{StaticResource AccentBlueBrush}" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>
