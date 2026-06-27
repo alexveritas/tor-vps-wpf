@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using TorVps.App.ViewModels;
 
 namespace TorVps.App;
@@ -16,6 +17,9 @@ public partial class MainWindow : Window
         var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "dev";
         Title = $"TorVps v{version}";
         VersionText.Text = $"Tor-vps v{version}";
+
+        viewModel.LogLines.CollectionChanged += (_, _) =>
+            Dispatcher.BeginInvoke(() => LogScrollViewer.ScrollToEnd(), DispatcherPriority.Background);
     }
 
     private void Titlebar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

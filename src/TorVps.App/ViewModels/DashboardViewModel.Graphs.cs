@@ -57,18 +57,17 @@ public partial class DashboardViewModel
         DownAreaPoints = BuildPoints(points, p => p.Down, _speedScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
         UpAreaPoints = BuildPoints(points, p => p.Up, _speedScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
         PingAreaPoints = BuildPoints(points, p => p.Ping, _pingScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
+        DownFillPoints = ToAreaPolygon(DownAreaPoints, TopGraphLogicalHeight);
+        UpFillPoints = ToAreaPolygon(UpAreaPoints, TopGraphLogicalHeight);
 
         var lastValid = validPoints.LastOrDefault();
         DownCurrentText = FormatSpeed(lastValid?.Down ?? 0);
         UpCurrentText = FormatSpeed(lastValid?.Up ?? 0);
         DownPeakText = FormatSpeed(validPoints.Length > 0 ? validPoints.Max(p => p.Down) : 0);
         UpPeakText = FormatSpeed(validPoints.Length > 0 ? validPoints.Max(p => p.Up) : 0);
-        DownAverageText = FormatSpeed(validPoints.Length > 0 ? validPoints.Average(p => p.Down) : 0);
-        UpAverageText = FormatSpeed(validPoints.Length > 0 ? validPoints.Average(p => p.Up) : 0);
 
         PingCurrentText = FormatPing(lastValid?.Ping ?? 0);
         PingPeakText = FormatPing(pingValues.Length > 0 ? pingValues.Max() : 0);
-        PingAverageText = FormatPing(pingValues.Length > 0 ? pingValues.Average() : 0);
 
         var vpsPoints = _vpsHistory.ToArray();
         var validVps = vpsPoints.Where(p => p.Valid).ToArray();
@@ -77,6 +76,8 @@ public partial class DashboardViewModel
 
         VpsDownAreaPoints = BuildPoints(vpsPoints, p => p.Down, _vpsScaleMax, VpsGraphCapacity, VpsGraphLogicalHeight);
         VpsUpAreaPoints = BuildPoints(vpsPoints, p => p.Up, _vpsScaleMax, VpsGraphCapacity, VpsGraphLogicalHeight);
+        VpsDownFillPoints = ToAreaPolygon(VpsDownAreaPoints, VpsGraphLogicalHeight);
+        VpsUpFillPoints = ToAreaPolygon(VpsUpAreaPoints, VpsGraphLogicalHeight);
 
         var lastValidVps = validVps.LastOrDefault();
         VpsCpuText = $"{Math.Round(lastValidVps?.Cpu ?? 0)}%";
@@ -101,6 +102,20 @@ public partial class DashboardViewModel
             collection.Add(new Point(paddingCount + i, (1 - normalized) * logicalHeight));
         }
         return collection;
+    }
+
+    /// <summary>Closes a line's points into a filled area shape by dropping straight down to the baseline and back.</summary>
+    private static PointCollection ToAreaPolygon(PointCollection linePoints, double logicalHeight)
+    {
+        if (linePoints.Count == 0)
+            return new PointCollection();
+
+        var polygon = new PointCollection(linePoints.Count + 2);
+        foreach (var point in linePoints)
+            polygon.Add(point);
+        polygon.Add(new Point(linePoints[^1].X, logicalHeight));
+        polygon.Add(new Point(linePoints[0].X, logicalHeight));
+        return polygon;
     }
 
     private static double NextStableScale(double current, double observed, double floor)

@@ -125,6 +125,7 @@ public partial class DashboardViewModel : ObservableObject
     public ObservableCollection<BridgeRecord> Bridges { get; } = new();
     public ObservableCollection<string> LogLines { get; } = new();
     public ObservableCollection<ConfigCheck> Checks { get; } = new();
+    public ObservableCollection<ConfigCheckGroup> CheckGroups { get; } = new();
 
     [ObservableProperty]
     private PointCollection _downAreaPoints = new();
@@ -141,15 +142,24 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty]
     private PointCollection _vpsUpAreaPoints = new();
 
+    [ObservableProperty]
+    private PointCollection _downFillPoints = new();
+
+    [ObservableProperty]
+    private PointCollection _upFillPoints = new();
+
+    [ObservableProperty]
+    private PointCollection _vpsDownFillPoints = new();
+
+    [ObservableProperty]
+    private PointCollection _vpsUpFillPoints = new();
+
     [ObservableProperty] private string _downPeakText = "0.00";
     [ObservableProperty] private string _downCurrentText = "0.00";
-    [ObservableProperty] private string _downAverageText = "0.00";
     [ObservableProperty] private string _upPeakText = "0.00";
     [ObservableProperty] private string _upCurrentText = "0.00";
-    [ObservableProperty] private string _upAverageText = "0.00";
     [ObservableProperty] private string _pingPeakText = "— ms";
     [ObservableProperty] private string _pingCurrentText = "— ms";
-    [ObservableProperty] private string _pingAverageText = "— ms";
 
     [ObservableProperty] private string _vpsCpuText = "0%";
     [ObservableProperty] private string _vpsRamText = "0%";
@@ -230,6 +240,9 @@ public partial class DashboardViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    private async Task RecheckConfigAsync() => await RefreshAsync();
+
     private async Task RefreshAsync()
     {
         if (_refreshing)
@@ -275,6 +288,7 @@ public partial class DashboardViewModel : ObservableObject
             ReplaceAll(LogLines, logLines);
             ReplaceAll(Checks, _configCheckService.Run(config));
             UpdateConfTabStatus();
+            UpdateCheckGroups();
 
             TunnelOn = torAlive;
             MihomoOn = mihomoAlive;
