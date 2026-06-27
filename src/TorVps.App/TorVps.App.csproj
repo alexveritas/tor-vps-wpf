@@ -9,6 +9,7 @@
     <AssemblyName>TorVps</AssemblyName>
     <RootNamespace>TorVps.App</RootNamespace>
     <Version>0.34.0</Version>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -21,4 +22,15 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
   </ItemGroup>
+
+  <Target Name="SetInformationalVersion" BeforeTargets="GetAssemblyVersion;GenerateAssemblyInfo">
+    <Exec Command="git rev-parse --short HEAD" ConsoleToMSBuild="true" StandardOutputImportance="low" ContinueOnError="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitSha" />
+    </Exec>
+    <PropertyGroup>
+      <GitSha Condition="'$(GitSha)' == ''">unknown</GitSha>
+      <BuildDate>$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd"))</BuildDate>
+      <InformationalVersion>$(Version)+$(GitSha).$(BuildDate)</InformationalVersion>
+    </PropertyGroup>
+  </Target>
 </Project>
