@@ -65,9 +65,10 @@
             <Border VerticalAlignment="Bottom" Height="1" Margin="-4,0,-4,0" Background="{StaticResource TabSeparatorBrush}" />
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                 <Button Content="Main" Style="{StaticResource MainTabButtonStyle}" Command="{Binding ShowMainTabCommand}" Margin="0,0,4,0" />
-                <Button Style="{StaticResource ConfTabButtonStyle}" Command="{Binding ShowConfTabCommand}">
+                <Button Content="Bridges" Style="{StaticResource BridgesTabButtonStyle}" Command="{Binding ShowBridgesTabCommand}" Margin="0,0,4,0" />
+                <Button Style="{StaticResource ConfigTabButtonStyle}" Command="{Binding ShowConfigTabCommand}">
                     <TextBlock Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
-                        <Run Text="Conf: " /><Run Text="{Binding ConfTabStatusText, Mode=OneWay}" />
+                        <Run Text="Config files: " /><Run Text="{Binding ConfTabStatusText, Mode=OneWay}" />
                     </TextBlock>
                 </Button>
             </StackPanel>
@@ -147,26 +148,8 @@
                         <RowDefinition Height="85" />
                     </Grid.RowDefinitions>
 
-                    <!-- Bridges: two numbered columns, same font as the log -->
-                    <Border Grid.Row="0" Style="{StaticResource PanelBorderStyle}" Margin="0,0,0,4" Padding="6,4,0,4">
-                        <ScrollViewer Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding Bridges}" Focusable="False">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <UniformGrid Columns="2" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock FontSize="9.5" Margin="0,1" TextTrimming="CharacterEllipsis"
-                                                   Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}">
-                                            <Run Foreground="{StaticResource TextMutedBrush}" Text="{Binding Index, Mode=OneWay}" /><Run Text=" " /><Run Text="{Binding Text, Mode=OneWay}" />
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Border>
+                    <!-- Placeholder: bridges moved to their own tab; reserved for future content -->
+                    <Border Grid.Row="0" Style="{StaticResource PanelBorderStyle}" Margin="0,0,0,4" />
 
                     <!-- Health chips (4 per row) -->
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding Health}" Focusable="False" Margin="0,0,0,4" VerticalAlignment="Center">
@@ -239,8 +222,31 @@
                 </Grid>
             </Grid>
 
-            <!-- ===================== CONF TAB ===================== -->
-            <Grid Visibility="{Binding IsConfTab, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <!-- ===================== BRIDGES TAB ===================== -->
+            <Grid Visibility="{Binding IsBridgesTab, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Border Style="{StaticResource PanelBorderStyle}" Padding="6,4,0,4">
+                    <ScrollViewer Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Bridges}" Focusable="False">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="2" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="9.5" Margin="0,1,12,1" TextTrimming="CharacterEllipsis"
+                                               Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}">
+                                        <Run Foreground="{StaticResource TextMutedBrush}" Text="{Binding Index, Mode=OneWay}" /><Run Text=" " /><Run Text="{Binding Text, Mode=OneWay}" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+
+            <!-- ===================== CONFIG FILES TAB ===================== -->
+            <Grid Visibility="{Binding IsConfigTab, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />

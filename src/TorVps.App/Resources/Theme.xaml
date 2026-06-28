@@ -140,9 +140,19 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="ConfTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabViewTabBaseStyle}">
+    <Style x:Key="BridgesTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabViewTabBaseStyle}">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsMainTab}" Value="False">
+            <DataTrigger Binding="{Binding IsBridgesTab}" Value="True">
+                <Setter Property="Background" Value="{StaticResource TabActiveSurfaceBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource TabActiveBorderBrush}" />
+                <Setter Property="Foreground" Value="White" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ConfigTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabViewTabBaseStyle}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsConfigTab}" Value="True">
                 <Setter Property="Background" Value="{StaticResource TabActiveSurfaceBrush}" />
                 <Setter Property="BorderBrush" Value="{StaticResource TabActiveBorderBrush}" />
                 <Setter Property="Foreground" Value="White" />

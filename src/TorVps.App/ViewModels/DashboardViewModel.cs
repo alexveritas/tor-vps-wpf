@@ -100,10 +100,14 @@ public partial class DashboardViewModel : ObservableObject
     private bool _rulesUpdating;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsConfTab))]
-    private bool _isMainTab = true;
+    [NotifyPropertyChangedFor(nameof(IsMainTab))]
+    [NotifyPropertyChangedFor(nameof(IsBridgesTab))]
+    [NotifyPropertyChangedFor(nameof(IsConfigTab))]
+    private DashboardTab _selectedTab = DashboardTab.Main;
 
-    public bool IsConfTab => !IsMainTab;
+    public bool IsMainTab => SelectedTab == DashboardTab.Main;
+    public bool IsBridgesTab => SelectedTab == DashboardTab.Bridges;
+    public bool IsConfigTab => SelectedTab == DashboardTab.Config;
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
@@ -223,10 +227,13 @@ public partial class DashboardViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ShowMainTab() => IsMainTab = true;
+    private void ShowMainTab() => SelectedTab = DashboardTab.Main;
 
     [RelayCommand]
-    private void ShowConfTab() => IsMainTab = false;
+    private void ShowBridgesTab() => SelectedTab = DashboardTab.Bridges;
+
+    [RelayCommand]
+    private void ShowConfigTab() => SelectedTab = DashboardTab.Config;
 
     [RelayCommand]
     private async Task UpdateRulesAsync()
