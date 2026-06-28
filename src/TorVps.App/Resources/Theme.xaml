@@ -44,8 +44,10 @@
     <SolidColorBrush x:Key="AccentBlueBrush" Color="#0A84FF" />
     <SolidColorBrush x:Key="AccentOrangeBrush" Color="#FF9F0A" />
     <SolidColorBrush x:Key="OnDarkTextBrush" Color="#03110A" />
-    <SolidColorBrush x:Key="ActiveTabBackgroundBrush" Color="#EDEDF0" />
-    <SolidColorBrush x:Key="ActiveTabForegroundBrush" Color="#15151A" />
+    <SolidColorBrush x:Key="ActiveTabBackgroundBrush" Color="#3A3A3C" />
+    <SolidColorBrush x:Key="ActiveTabForegroundBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ActiveTabBorderBrush" Color="#5C5C60" />
+    <SolidColorBrush x:Key="InactiveTabForegroundBrush" Color="#C7C7CC" />
 
     <!-- Graph series -->
     <SolidColorBrush x:Key="DownSeriesBrush" Color="#74F59A" />
@@ -62,6 +64,10 @@
     <LinearGradientBrush x:Key="UpAreaFillBrush" StartPoint="0,0" EndPoint="0,1">
         <GradientStop Color="#5040C8FF" Offset="0" />
         <GradientStop Color="#0040C8FF" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="PingAreaFillBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#4DFF6969" Offset="0" />
+        <GradientStop Color="#00FF6969" Offset="1" />
     </LinearGradientBrush>
 
     <!-- ============================================================= -->
@@ -109,18 +115,19 @@
     </Style>
 
     <Style x:Key="TabButtonBaseStyle" TargetType="Button">
-        <Setter Property="Height" Value="24" />
-        <Setter Property="MinWidth" Value="54" />
-        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinWidth" Value="58" />
+        <Setter Property="Padding" Value="16,0" />
         <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource InactiveTabForegroundBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="11">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="11">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
                     </Border>
                 </ControlTemplate>
@@ -132,6 +139,7 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsMainTab}" Value="True">
                 <Setter Property="Background" Value="{StaticResource ActiveTabBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource ActiveTabBorderBrush}" />
                 <Setter Property="Foreground" Value="{StaticResource ActiveTabForegroundBrush}" />
             </DataTrigger>
         </Style.Triggers>
@@ -141,6 +149,7 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsMainTab}" Value="False">
                 <Setter Property="Background" Value="{StaticResource ActiveTabBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource ActiveTabBorderBrush}" />
                 <Setter Property="Foreground" Value="{StaticResource ActiveTabForegroundBrush}" />
             </DataTrigger>
         </Style.Triggers>
@@ -148,15 +157,15 @@
 
     <!-- iOS sliding switch (Tor / mihomo) -->
     <Style x:Key="BinaryToggleStyle" TargetType="ToggleButton">
-        <Setter Property="Width" Value="42" />
-        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="46" />
+        <Setter Property="Height" Value="26" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
-                    <Border x:Name="Track" Background="{StaticResource ToggleTrackBrush}" CornerRadius="12">
-                        <Grid Margin="2,0">
-                            <Ellipse x:Name="Knob" Width="20" Height="20" HorizontalAlignment="Left" Fill="White">
+                    <Border x:Name="Track" Background="{StaticResource ToggleTrackBrush}" CornerRadius="13">
+                        <Grid Margin="1,0">
+                            <Ellipse x:Name="Knob" Width="24" Height="24" HorizontalAlignment="Left" Fill="White">
                                 <Ellipse.Effect>
                                     <DropShadowEffect BlurRadius="3" ShadowDepth="1" Opacity="0.35" Color="Black" />
                                 </Ellipse.Effect>
@@ -182,7 +191,7 @@
         <Setter Property="Background" Value="{StaticResource PanelBackgroundBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource PanelBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="{StaticResource RadiusLarge}" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}" />
     </Style>
 
     <!-- Status card tile (5-card row) -->
@@ -262,7 +271,7 @@
 
     <!-- Thin minimal scrollbar -->
     <Style TargetType="ScrollBar">
-        <Setter Property="Width" Value="6" />
+        <Setter Property="Width" Value="4" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
@@ -272,7 +281,7 @@
                             <Thumb>
                                 <Thumb.Template>
                                     <ControlTemplate TargetType="Thumb">
-                                        <Border Background="#33FFFFFF" CornerRadius="3" />
+                                        <Border Background="#2EFFFFFF" CornerRadius="2" />
                                     </ControlTemplate>
                                 </Thumb.Template>
                             </Thumb>

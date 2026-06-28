@@ -149,6 +149,9 @@ public partial class DashboardViewModel : ObservableObject
     private PointCollection _upFillPoints = new();
 
     [ObservableProperty]
+    private PointCollection _pingFillPoints = new();
+
+    [ObservableProperty]
     private PointCollection _vpsDownFillPoints = new();
 
     [ObservableProperty]

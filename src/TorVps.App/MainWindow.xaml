@@ -97,8 +97,8 @@
                         <DataTemplate>
                             <Border Style="{StaticResource StatusCardBorderStyle}" Background="{Binding State, Converter={StaticResource HealthStateToBackgroundBrushConverter}}">
                                 <StackPanel>
-                                    <TextBlock Text="{Binding Title}" FontSize="9" FontWeight="SemiBold" Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                    <TextBlock Text="{Binding Text}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{Binding Title}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Text}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"
                                                Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
                                 </StackPanel>
                             </Border>
@@ -109,12 +109,13 @@
                 <!-- Bandwidth/ping graph: chart with overlaid max/cur/avg labels (speed left, ping right) -->
                 <Grid Grid.Row="1" Height="76" Margin="2,0,2,8">
                     <Viewbox Stretch="Fill">
-                        <Canvas Width="520" Height="64" Background="Transparent">
-                            <Polygon Points="{Binding UpFillPoints}" Fill="{StaticResource UpAreaFillBrush}" />
+                        <Canvas Width="520" Height="50" Background="Transparent">
                             <Polygon Points="{Binding DownFillPoints}" Fill="{StaticResource DownAreaFillBrush}" />
-                            <Polyline Points="{Binding UpAreaPoints}" Stroke="{StaticResource UpSeriesBrush}" StrokeThickness="1.2" />
+                            <Polygon Points="{Binding UpFillPoints}" Fill="{StaticResource UpAreaFillBrush}" />
+                            <Polygon Points="{Binding PingFillPoints}" Fill="{StaticResource PingAreaFillBrush}" />
                             <Polyline Points="{Binding DownAreaPoints}" Stroke="{StaticResource DownSeriesBrush}" StrokeThickness="1.2" />
-                            <Polyline Points="{Binding PingAreaPoints}" Stroke="{StaticResource PingSeriesBrush}" StrokeThickness="1" Opacity="0.85" />
+                            <Polyline Points="{Binding UpAreaPoints}" Stroke="{StaticResource UpSeriesBrush}" StrokeThickness="1.2" />
+                            <Polyline Points="{Binding PingAreaPoints}" Stroke="{StaticResource PingSeriesBrush}" StrokeThickness="1" />
                         </Canvas>
                     </Viewbox>
                     <!-- Speed labels: max / cur / avg (↓ down, ↑ up) -->
@@ -176,8 +177,8 @@
                             <DataTemplate>
                                 <Border Style="{StaticResource HealthChipBorderStyle}" Background="{Binding State, Converter={StaticResource HealthStateToBackgroundBrushConverter}}">
                                     <StackPanel>
-                                        <TextBlock Text="{Binding Label}" FontSize="8" Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" />
-                                        <TextBlock Text="{Binding Text}" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center"
+                                        <TextBlock Text="{Binding Label}" FontSize="9" Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" />
+                                        <TextBlock Text="{Binding Text}" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,1,0,0"
                                                    Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
                                     </StackPanel>
                                 </Border>

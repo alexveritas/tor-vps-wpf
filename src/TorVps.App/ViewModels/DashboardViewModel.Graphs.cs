@@ -59,6 +59,7 @@ public partial class DashboardViewModel
         PingAreaPoints = BuildPoints(points, p => p.Ping, _pingScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
         DownFillPoints = ToAreaPolygon(DownAreaPoints, TopGraphLogicalHeight);
         UpFillPoints = ToAreaPolygon(UpAreaPoints, TopGraphLogicalHeight);
+        PingFillPoints = ToAreaPolygon(PingAreaPoints, TopGraphLogicalHeight);
 
         var lastValid = validPoints.LastOrDefault();
         DownCurrentText = FormatSpeed(lastValid?.Down ?? 0);
