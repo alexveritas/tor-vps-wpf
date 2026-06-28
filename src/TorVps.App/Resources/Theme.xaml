@@ -13,7 +13,7 @@
     <!-- Corner radii -->
     <CornerRadius x:Key="RadiusLarge">14</CornerRadius>
     <CornerRadius x:Key="RadiusMedium">10</CornerRadius>
-    <CornerRadius x:Key="RadiusSmall">7</CornerRadius>
+    <CornerRadius x:Key="RadiusSmall">6</CornerRadius>
     <CornerRadius x:Key="RadiusPill">13</CornerRadius>
 
     <!-- Surfaces -->
@@ -35,6 +35,8 @@
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F5F5F7" />
     <SolidColorBrush x:Key="TextMutedBrush" Color="#8E8E93" />
     <SolidColorBrush x:Key="TextDimBrush" Color="#9EB4D3" />
+    <!-- Brighter, heavier grey used for block/card/chip names (matches reference #aeb9ca) -->
+    <SolidColorBrush x:Key="LabelBrightBrush" Color="#AEB9CA" />
 
     <!-- Accents (iOS-12 dark system colors) -->
     <SolidColorBrush x:Key="AccentGreenBrush" Color="#30D158" />
@@ -105,29 +107,32 @@
         </Setter>
     </Style>
 
-    <!-- Segmented control (Main/Conf): a dark rounded track wrapping the buttons -->
-    <Style x:Key="TabTrackStyle" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource TabTrackBrush}" />
-        <Setter Property="BorderBrush" Value="#14FFFFFF" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="{StaticResource RadiusPill}" />
-        <Setter Property="Padding" Value="2" />
-    </Style>
+    <!-- TabView tab surfaces (Main/Conf) -->
+    <SolidColorBrush x:Key="TabSeparatorBrush" Color="#24FFFFFF" />
+    <SolidColorBrush x:Key="TabInactiveSurfaceBrush" Color="#07FFFFFF" />
+    <SolidColorBrush x:Key="TabInactiveBorderBrush" Color="#12FFFFFF" />
+    <SolidColorBrush x:Key="TabActiveBorderBrush" Color="#22FFFFFF" />
+    <LinearGradientBrush x:Key="TabActiveSurfaceBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#1E2128" Offset="0" />
+        <GradientStop Color="#181B21" Offset="1" />
+    </LinearGradientBrush>
 
-    <Style x:Key="TabButtonBaseStyle" TargetType="Button">
-        <Setter Property="Height" Value="26" />
-        <Setter Property="MinWidth" Value="58" />
+    <!-- TabView tab (Main/Conf): top-rounded, bordered top+sides only, joins the content separator below -->
+    <Style x:Key="TabViewTabBaseStyle" TargetType="Button">
+        <Setter Property="Height" Value="31" />
+        <Setter Property="MinWidth" Value="62" />
         <Setter Property="Padding" Value="16,0" />
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="Foreground" Value="{StaticResource InactiveTabForegroundBrush}" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="Background" Value="{StaticResource TabInactiveSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TabInactiveBorderBrush}" />
+        <Setter Property="Foreground" Value="#C7C7CC" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="11">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,1,1,0" CornerRadius="10,10,0,0">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
                     </Border>
                 </ControlTemplate>
@@ -135,22 +140,22 @@
         </Setter>
     </Style>
 
-    <Style x:Key="MainTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabButtonBaseStyle}">
+    <Style x:Key="MainTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabViewTabBaseStyle}">
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsMainTab}" Value="True">
-                <Setter Property="Background" Value="{StaticResource ActiveTabBackgroundBrush}" />
-                <Setter Property="BorderBrush" Value="{StaticResource ActiveTabBorderBrush}" />
-                <Setter Property="Foreground" Value="{StaticResource ActiveTabForegroundBrush}" />
+                <Setter Property="Background" Value="{StaticResource TabActiveSurfaceBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource TabActiveBorderBrush}" />
+                <Setter Property="Foreground" Value="White" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="ConfTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabButtonBaseStyle}">
+    <Style x:Key="ConfTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabViewTabBaseStyle}">
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsMainTab}" Value="False">
-                <Setter Property="Background" Value="{StaticResource ActiveTabBackgroundBrush}" />
-                <Setter Property="BorderBrush" Value="{StaticResource ActiveTabBorderBrush}" />
-                <Setter Property="Foreground" Value="{StaticResource ActiveTabForegroundBrush}" />
+                <Setter Property="Background" Value="{StaticResource TabActiveSurfaceBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource TabActiveBorderBrush}" />
+                <Setter Property="Foreground" Value="White" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -194,18 +199,20 @@
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}" />
     </Style>
 
-    <!-- Status card tile (5-card row) -->
+    <!-- Status card tile (5-card row): reference 84x40, radius 6 -->
     <Style x:Key="StatusCardBorderStyle" TargetType="Border">
+        <Setter Property="Height" Value="40" />
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}" />
         <Setter Property="Margin" Value="2,0" />
-        <Setter Property="Padding" Value="4,6" />
+        <Setter Property="Padding" Value="3,0" />
     </Style>
 
-    <!-- Health chip tile -->
+    <!-- Health chip tile: reference 20px tall, radius 6 -->
     <Style x:Key="HealthChipBorderStyle" TargetType="Border">
+        <Setter Property="Height" Value="20" />
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}" />
         <Setter Property="Margin" Value="2" />
-        <Setter Property="Padding" Value="4" />
+        <Setter Property="Padding" Value="3,0" />
     </Style>
 
     <!-- Filled (green) pill action button -->
