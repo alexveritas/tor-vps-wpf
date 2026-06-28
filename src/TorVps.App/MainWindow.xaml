@@ -107,8 +107,9 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- Bandwidth/ping graph (72px): filled chart with overlaid max/cur/avg labels -->
-                <Grid Grid.Row="1" Height="72" Margin="0,0,0,4">
+                <!-- Bandwidth/ping graph (72px), framed like the log block -->
+                <Border Grid.Row="1" Style="{StaticResource PanelBorderStyle}" Height="72" Margin="0,0,0,4" Padding="6,3">
+                    <Grid>
                     <Viewbox Stretch="Fill">
                         <Canvas Width="520" Height="50" Background="Transparent">
                             <Polygon Points="{Binding DownFillPoints}" Fill="{StaticResource DownAreaFillBrush}" />
@@ -137,7 +138,8 @@
                         <TextBlock FontSize="9" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,2,0,0" Foreground="{StaticResource PingSeriesBrush}" Text="{Binding PingCurrentText, Mode=OneWay}" />
                         <TextBlock FontSize="9" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,2,0,0" Foreground="{StaticResource PingSeriesBrush}" Text="{Binding PingAverageText, Mode=OneWay}" />
                     </StackPanel>
-                </Grid>
+                    </Grid>
+                </Border>
 
                 <!-- Lower section: bridges (*) / health (52) / vps (44) / log (5 lines) -->
                 <Grid Grid.Row="2">
@@ -148,9 +150,10 @@
                         <RowDefinition Height="85" />
                     </Grid.RowDefinitions>
 
-                    <!-- Bridges: two numbered columns -->
-                    <ScrollViewer Grid.Row="0" Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto" Margin="0,0,0,4">
-                        <ItemsControl ItemsSource="{Binding Bridges}" Focusable="False">
+                    <!-- Bridges: two numbered columns, framed like the log block -->
+                    <Border Grid.Row="0" Style="{StaticResource PanelBorderStyle}" Margin="0,0,0,4" Padding="6,4">
+                        <ScrollViewer Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Bridges}" Focusable="False">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <UniformGrid Columns="2" />
@@ -165,7 +168,8 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </ScrollViewer>
+                        </ScrollViewer>
+                    </Border>
 
                     <!-- Health chips (4 per row, 20px tall) -->
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding Health}" Focusable="False" Margin="0,0,0,4" VerticalAlignment="Center">
@@ -187,8 +191,9 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <!-- VPS compact metrics row + sparkline -->
-                    <Grid Grid.Row="2" Margin="0,0,0,4" ToolTip="{Binding ServerTooltip}" VerticalAlignment="Center">
+                    <!-- VPS compact metrics row + sparkline, framed like the log block -->
+                    <Border Grid.Row="2" Style="{StaticResource PanelBorderStyle}" Margin="0,0,0,4" Padding="8,2" ToolTip="{Binding ServerTooltip}">
+                        <Grid VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
@@ -218,10 +223,11 @@
                                 <Polyline Points="{Binding VpsUpAreaPoints}" Stroke="{StaticResource UpSeriesBrush}" StrokeThickness="1" />
                             </Canvas>
                         </Viewbox>
-                    </Grid>
+                        </Grid>
+                    </Border>
 
                     <!-- Runtime log: fixed 5-line viewport (15px line-height) so whole lines always show -->
-                    <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Padding="8,4">
+                    <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Padding="6,4">
                         <ScrollViewer x:Name="LogScrollViewer" Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding LogLines}" Focusable="False">
                                 <ItemsControl.ItemTemplate>
