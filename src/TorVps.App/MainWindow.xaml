@@ -111,7 +111,7 @@
                 <Border Grid.Row="1" Style="{StaticResource PanelBorderStyle}" Height="72" Margin="0,0,0,4" Padding="6,3">
                     <Grid>
                     <Viewbox Stretch="Fill">
-                        <Canvas Width="520" Height="50" Background="Transparent">
+                        <Canvas Width="520" Height="50" Background="Transparent" ClipToBounds="True">
                             <Polygon Points="{Binding DownFillPoints}" Fill="{StaticResource DownAreaFillBrush}" />
                             <Polygon Points="{Binding UpFillPoints}" Fill="{StaticResource UpAreaFillBrush}" />
                             <Polygon Points="{Binding PingFillPoints}" Fill="{StaticResource PingAreaFillBrush}" />
@@ -216,7 +216,7 @@
                             </TextBlock>
                         </StackPanel>
                         <Viewbox Grid.Column="3" Stretch="Fill" Height="24">
-                            <Canvas Width="260" Height="24" Background="Transparent">
+                            <Canvas Width="260" Height="24" Background="Transparent" ClipToBounds="True">
                                 <Polygon Points="{Binding VpsDownFillPoints}" Fill="{StaticResource DownAreaFillBrush}" />
                                 <Polygon Points="{Binding VpsUpFillPoints}" Fill="{StaticResource UpAreaFillBrush}" />
                                 <Polyline Points="{Binding VpsDownAreaPoints}" Stroke="{StaticResource DownSeriesBrush}" StrokeThickness="1" />
