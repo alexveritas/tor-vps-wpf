@@ -59,18 +59,10 @@
     <SolidColorBrush x:Key="MemSeriesBrush" Color="#BF5AF2" />
     <SolidColorBrush x:Key="GraphGridBrush" Color="#202B3B" />
 
-    <LinearGradientBrush x:Key="DownAreaFillBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#5C34C759" Offset="0" />
-        <GradientStop Color="#0034C759" Offset="1" />
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="UpAreaFillBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#5040C8FF" Offset="0" />
-        <GradientStop Color="#0040C8FF" Offset="1" />
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="PingAreaFillBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#4DFF6969" Offset="0" />
-        <GradientStop Color="#00FF6969" Offset="1" />
-    </LinearGradientBrush>
+    <!-- Flat translucent area fills (reference uses uniform fillOpacity ~0.24, not a fade-to-transparent) -->
+    <SolidColorBrush x:Key="DownAreaFillBrush" Color="#3D34C759" />
+    <SolidColorBrush x:Key="UpAreaFillBrush" Color="#3340C8FF" />
+    <SolidColorBrush x:Key="PingAreaFillBrush" Color="#30FF6969" />
 
     <!-- ============================================================= -->
     <!--  COMPONENT SKINS                                               -->
@@ -288,7 +280,7 @@
                             <Thumb>
                                 <Thumb.Template>
                                     <ControlTemplate TargetType="Thumb">
-                                        <Border Background="#3AFFFFFF" CornerRadius="2.5" />
+                                        <Border Background="#57FFFFFF" Width="5" HorizontalAlignment="Center" CornerRadius="2.5" />
                                     </ControlTemplate>
                                 </Thumb.Template>
                             </Thumb>
@@ -314,16 +306,12 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ScrollViewer">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Column="0"
+                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
                                                 Margin="{TemplateBinding Padding}"
                                                 CanContentScroll="{TemplateBinding CanContentScroll}" />
-                        <ScrollBar x:Name="PART_VerticalScrollBar" Grid.Column="1"
-                                   Style="{StaticResource ThinScrollBarStyle}"
-                                   Orientation="Vertical" Margin="3,0,0,0"
+                        <ScrollBar x:Name="PART_VerticalScrollBar" HorizontalAlignment="Right"
+                                   Style="{StaticResource ThinScrollBarStyle}" Width="7"
+                                   Orientation="Vertical"
                                    Minimum="0" Maximum="{TemplateBinding ScrollableHeight}"
                                    ViewportSize="{TemplateBinding ViewportHeight}"
                                    Value="{TemplateBinding VerticalOffset}"
