@@ -16,23 +16,23 @@
     <CornerRadius x:Key="RadiusSmall">6</CornerRadius>
     <CornerRadius x:Key="RadiusPill">13</CornerRadius>
 
-    <!-- Surfaces -->
+    <!-- Surfaces (reference navy theme: body #070a10, shell #0b1018, panel #101722) -->
     <LinearGradientBrush x:Key="WindowBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#0C0C0F" Offset="0" />
-        <GradientStop Color="#050506" Offset="1" />
+        <GradientStop Color="#0B1018" Offset="0" />
+        <GradientStop Color="#080B12" Offset="1" />
     </LinearGradientBrush>
-    <SolidColorBrush x:Key="TitlebarBackgroundBrush" Color="#0E0E11" />
-    <SolidColorBrush x:Key="TitlebarBorderBrush" Color="#1AFFFFFF" />
-    <SolidColorBrush x:Key="SurfaceBrush" Color="#1C1C1E" />
-    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="#2C2C2E" />
-    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#D81C1C1E" />
-    <SolidColorBrush x:Key="PanelBorderBrush" Color="#14FFFFFF" />
-    <SolidColorBrush x:Key="SeparatorBrush" Color="#1FFFFFFF" />
+    <SolidColorBrush x:Key="TitlebarBackgroundBrush" Color="#0B1018" />
+    <SolidColorBrush x:Key="TitlebarBorderBrush" Color="#202938" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#101722" />
+    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="#16202E" />
+    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#101722" />
+    <SolidColorBrush x:Key="PanelBorderBrush" Color="#263247" />
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#263247" />
     <SolidColorBrush x:Key="ToggleTrackBrush" Color="#39393D" />
-    <SolidColorBrush x:Key="TabTrackBrush" Color="#16161A" />
+    <SolidColorBrush x:Key="TabTrackBrush" Color="#111927" />
 
     <!-- Text -->
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#EAF1FF" />
     <SolidColorBrush x:Key="TextMutedBrush" Color="#8E8E93" />
     <SolidColorBrush x:Key="TextDimBrush" Color="#9EB4D3" />
     <!-- Brighter, heavier grey used for block/card/chip names (matches reference #aeb9ca) -->
@@ -276,9 +276,9 @@
         </Setter>
     </Style>
 
-    <!-- Thin minimal scrollbar -->
-    <Style TargetType="ScrollBar">
-        <Setter Property="Width" Value="4" />
+    <!-- Thin scrollbar (reference: 5px, rounded translucent thumb, transparent track) -->
+    <Style x:Key="ThinScrollBarStyle" TargetType="ScrollBar">
+        <Setter Property="Width" Value="5" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
@@ -288,7 +288,7 @@
                             <Thumb>
                                 <Thumb.Template>
                                     <ControlTemplate TargetType="Thumb">
-                                        <Border Background="#2EFFFFFF" CornerRadius="2" />
+                                        <Border Background="#3AFFFFFF" CornerRadius="2.5" />
                                     </ControlTemplate>
                                 </Thumb.Template>
                             </Thumb>
@@ -300,6 +300,35 @@
                             <RepeatButton Opacity="0" Focusable="False" Command="ScrollBar.PageDownCommand" />
                         </Track.IncreaseRepeatButton>
                     </Track>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Implicit fallback for any stray ScrollBar -->
+    <Style TargetType="ScrollBar" BasedOn="{StaticResource ThinScrollBarStyle}" />
+
+    <!-- ScrollViewer with a guaranteed thin 5px vertical scrollbar in a 5px gutter -->
+    <Style x:Key="ThinScrollViewerStyle" TargetType="ScrollViewer">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Column="0"
+                                                Margin="{TemplateBinding Padding}"
+                                                CanContentScroll="{TemplateBinding CanContentScroll}" />
+                        <ScrollBar x:Name="PART_VerticalScrollBar" Grid.Column="1"
+                                   Style="{StaticResource ThinScrollBarStyle}"
+                                   Orientation="Vertical" Margin="3,0,0,0"
+                                   Minimum="0" Maximum="{TemplateBinding ScrollableHeight}"
+                                   ViewportSize="{TemplateBinding ViewportHeight}"
+                                   Value="{TemplateBinding VerticalOffset}"
+                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
