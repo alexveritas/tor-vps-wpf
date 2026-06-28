@@ -150,8 +150,8 @@
                         <RowDefinition Height="85" />
                     </Grid.RowDefinitions>
 
-                    <!-- Bridges: two numbered columns, framed like the log block -->
-                    <Border Grid.Row="0" Style="{StaticResource PanelBorderStyle}" Margin="0,0,0,4" Padding="6,4">
+                    <!-- Bridges: two numbered columns, framed like the log block (scrollbar gutter flush to right edge) -->
+                    <Border Grid.Row="0" Style="{StaticResource PanelBorderStyle}" Margin="0,0,0,4" Padding="6,4,0,4">
                         <ScrollViewer Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding Bridges}" Focusable="False">
                             <ItemsControl.ItemsPanel>
@@ -227,7 +227,7 @@
                     </Border>
 
                     <!-- Runtime log: fixed 5-line viewport (15px line-height) so whole lines always show -->
-                    <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Padding="6,4">
+                    <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Padding="6,4,0,4">
                         <ScrollViewer x:Name="LogScrollViewer" Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding LogLines}" Focusable="False">
                                 <ItemsControl.ItemTemplate>
