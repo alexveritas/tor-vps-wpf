@@ -75,10 +75,13 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" MinHeight="80" />
+                    <RowDefinition Height="85" />
                 </Grid.RowDefinitions>
 
-                <!-- 5 status cards -->
+                <!-- 1. status cards -->
                 <ItemsControl Grid.Row="0" ItemsSource="{Binding Cards}" Margin="0,0,0,4" Focusable="False">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -98,8 +101,28 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- Bandwidth/ping graph: cropped to just fit the 3 value rows (down/up/ping) -->
-                <Border Grid.Row="1" Style="{StaticResource PanelBorderStyle}" Height="48" Margin="0,0,0,4" Padding="6,3">
+                <!-- 2. Health chips (4 per row) -->
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Health}" Focusable="False" Margin="0,0,0,4">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="4" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource HealthChipBorderStyle}" Background="{Binding State, Converter={StaticResource HealthStateToBackgroundBrushConverter}}">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Label}" FontSize="9" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Text}" FontSize="9" Margin="4,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                               Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- 3. Bandwidth/ping graph: cropped to just fit the 3 value rows (down/up/ping) -->
+                <Border Grid.Row="2" Style="{StaticResource PanelBorderStyle}" Height="48" Margin="0,0,0,4" Padding="6,3">
                     <Grid>
                         <Viewbox Stretch="Fill">
                             <Canvas Width="520" Height="50" Background="Transparent" ClipToBounds="True">
@@ -144,87 +167,57 @@
                     </Grid>
                 </Border>
 
-                <!-- Lower section: bridges (*) / health (52) / vps (44) / log (5 lines) -->
-                <Grid Grid.Row="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" MinHeight="120" />
-                        <RowDefinition Height="52" />
-                        <RowDefinition Height="44" />
-                        <RowDefinition Height="85" />
-                    </Grid.RowDefinitions>
+                <!-- 4. VPS compact metrics row + sparkline -->
+                <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Height="44" Margin="0,0,0,4" Padding="8,2" ToolTip="{Binding ServerTooltip}">
+                    <Grid VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="130" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="VPS" FontSize="10" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
+                                <TextBlock FontSize="10" Foreground="{StaticResource CpuSeriesBrush}"><Run Text="CPU " /><Run Text="{Binding VpsCpuText, Mode=OneWay}" /></TextBlock>
+                            </Border>
+                            <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
+                                <TextBlock FontSize="10" Foreground="{StaticResource MemSeriesBrush}"><Run Text="RAM " /><Run Text="{Binding VpsRamText, Mode=OneWay}" /></TextBlock>
+                            </Border>
+                            <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
+                                <TextBlock FontSize="10" Foreground="{StaticResource DownSeriesBrush}"><Run Text="↓" /><Run Text="{Binding VpsDownCurrentText, Mode=OneWay}" /></TextBlock>
+                            </Border>
+                            <Border Style="{StaticResource GraphValueChipStyle}">
+                                <TextBlock FontSize="10" Foreground="{StaticResource UpSeriesBrush}"><Run Text="↑" /><Run Text="{Binding VpsUpCurrentText, Mode=OneWay}" /></TextBlock>
+                            </Border>
+                        </StackPanel>
+                        <Viewbox Grid.Column="3" Stretch="Fill" Height="24">
+                            <Canvas Width="260" Height="24" Background="Transparent" ClipToBounds="True">
+                                <Polygon Points="{Binding VpsDownFillPoints}" Fill="{StaticResource DownAreaFillBrush}" />
+                                <Polygon Points="{Binding VpsUpFillPoints}" Fill="{StaticResource UpAreaFillBrush}" />
+                                <Polyline Points="{Binding VpsDownAreaPoints}" Stroke="{StaticResource DownSeriesBrush}" StrokeThickness="1" />
+                                <Polyline Points="{Binding VpsUpAreaPoints}" Stroke="{StaticResource UpSeriesBrush}" StrokeThickness="1" />
+                            </Canvas>
+                        </Viewbox>
+                    </Grid>
+                </Border>
 
-                    <!-- Placeholder: bridges moved to their own tab; reserved for future content -->
-                    <Border Grid.Row="0" Style="{StaticResource PanelBorderStyle}" Margin="0,0,0,4" />
+                <!-- 5. Placeholder (reserved for future content) -->
+                <Border Grid.Row="4" Style="{StaticResource PanelBorderStyle}" Margin="0,0,0,4" />
 
-                    <!-- Health chips (4 per row) -->
-                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Health}" Focusable="False" Margin="0,0,0,4" VerticalAlignment="Center">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="4" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Style="{StaticResource HealthChipBorderStyle}" Background="{Binding State, Converter={StaticResource HealthStateToBackgroundBrushConverter}}">
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding Label}" FontSize="9" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding Text}" FontSize="9" Margin="4,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                                                   Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <!-- VPS compact metrics row + sparkline -->
-                    <Border Grid.Row="2" Style="{StaticResource PanelBorderStyle}" Margin="0,0,0,4" Padding="8,2" ToolTip="{Binding ServerTooltip}">
-                        <Grid VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="130" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="VPS" FontSize="10" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
-                                    <TextBlock FontSize="10" Foreground="{StaticResource CpuSeriesBrush}"><Run Text="CPU " /><Run Text="{Binding VpsCpuText, Mode=OneWay}" /></TextBlock>
-                                </Border>
-                                <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
-                                    <TextBlock FontSize="10" Foreground="{StaticResource MemSeriesBrush}"><Run Text="RAM " /><Run Text="{Binding VpsRamText, Mode=OneWay}" /></TextBlock>
-                                </Border>
-                                <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
-                                    <TextBlock FontSize="10" Foreground="{StaticResource DownSeriesBrush}"><Run Text="↓" /><Run Text="{Binding VpsDownCurrentText, Mode=OneWay}" /></TextBlock>
-                                </Border>
-                                <Border Style="{StaticResource GraphValueChipStyle}">
-                                    <TextBlock FontSize="10" Foreground="{StaticResource UpSeriesBrush}"><Run Text="↑" /><Run Text="{Binding VpsUpCurrentText, Mode=OneWay}" /></TextBlock>
-                                </Border>
-                            </StackPanel>
-                            <Viewbox Grid.Column="3" Stretch="Fill" Height="24">
-                                <Canvas Width="260" Height="24" Background="Transparent" ClipToBounds="True">
-                                    <Polygon Points="{Binding VpsDownFillPoints}" Fill="{StaticResource DownAreaFillBrush}" />
-                                    <Polygon Points="{Binding VpsUpFillPoints}" Fill="{StaticResource UpAreaFillBrush}" />
-                                    <Polyline Points="{Binding VpsDownAreaPoints}" Stroke="{StaticResource DownSeriesBrush}" StrokeThickness="1" />
-                                    <Polyline Points="{Binding VpsUpAreaPoints}" Stroke="{StaticResource UpSeriesBrush}" StrokeThickness="1" />
-                                </Canvas>
-                            </Viewbox>
-                        </Grid>
-                    </Border>
-
-                    <!-- Runtime log: fixed 5-line viewport (15px line-height) so whole lines always show -->
-                    <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Padding="6,4,0,4">
-                        <ScrollViewer x:Name="LogScrollViewer" Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding LogLines}" Focusable="False">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding}" FontSize="9.5" LineHeight="15" LineStackingStrategy="BlockLineHeight"
-                                                   Foreground="{StaticResource TextDimBrush}" TextWrapping="NoWrap" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Border>
-                </Grid>
+                <!-- 6. Runtime log: fixed 5-line viewport (15px line-height) so whole lines always show -->
+                <Border Grid.Row="5" Style="{StaticResource PanelBorderStyle}" Padding="6,4,0,4">
+                    <ScrollViewer x:Name="LogScrollViewer" Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding LogLines}" Focusable="False">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="9.5" LineHeight="15" LineStackingStrategy="BlockLineHeight"
+                                               Foreground="{StaticResource TextDimBrush}" TextWrapping="NoWrap" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
             </Grid>
 
             <!-- ===================== BRIDGES TAB ===================== -->
