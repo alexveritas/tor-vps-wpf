@@ -30,6 +30,11 @@
     <SolidColorBrush x:Key="SeparatorBrush" Color="#263247" />
     <!-- Off (inactive) toggle track: the darkest tone in the window -->
     <SolidColorBrush x:Key="ToggleTrackBrush" Color="#080B12" />
+    <!-- On toggle track: same muted green tint as the status blocks (not the bright accent green) -->
+    <LinearGradientBrush x:Key="ToggleOnTrackBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#3D30D158" Offset="0" />
+        <GradientStop Color="#2630D158" Offset="1" />
+    </LinearGradientBrush>
     <SolidColorBrush x:Key="TabTrackBrush" Color="#111927" />
 
     <!-- Text -->
@@ -171,16 +176,18 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
-                    <Border x:Name="Track" Background="{StaticResource ToggleTrackBrush}" CornerRadius="12">
+                    <Grid>
+                        <!-- Track and knob are siblings so the Border's corner-radius clip never crops the knob -->
+                        <Border x:Name="Track" Height="24" VerticalAlignment="Center" Background="{StaticResource ToggleTrackBrush}" CornerRadius="12" />
                         <Ellipse x:Name="Knob" Width="26" Height="26" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-1,0,0,0" Fill="{StaticResource TextDimBrush}">
                             <Ellipse.Effect>
                                 <DropShadowEffect BlurRadius="3" ShadowDepth="1" Opacity="0.35" Color="Black" />
                             </Ellipse.Effect>
                         </Ellipse>
-                    </Border>
+                    </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Track" Property="Background" Value="{StaticResource AccentGreenBrush}" />
+                            <Setter TargetName="Track" Property="Background" Value="{StaticResource ToggleOnTrackBrush}" />
                             <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
                             <Setter TargetName="Knob" Property="Margin" Value="0,0,-1,0" />
                         </Trigger>
