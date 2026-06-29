@@ -28,7 +28,8 @@
     <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#101722" />
     <SolidColorBrush x:Key="PanelBorderBrush" Color="#263247" />
     <SolidColorBrush x:Key="SeparatorBrush" Color="#263247" />
-    <SolidColorBrush x:Key="ToggleTrackBrush" Color="#39393D" />
+    <!-- Off (inactive) toggle track: the darkest tone in the window -->
+    <SolidColorBrush x:Key="ToggleTrackBrush" Color="#080B12" />
     <SolidColorBrush x:Key="TabTrackBrush" Color="#111927" />
 
     <!-- Text -->
@@ -37,6 +38,8 @@
     <SolidColorBrush x:Key="TextDimBrush" Color="#9EB4D3" />
     <!-- Brighter, heavier grey used for block/card/chip names (matches reference #aeb9ca) -->
     <SolidColorBrush x:Key="LabelBrightBrush" Color="#AEB9CA" />
+    <!-- Translucent dark chip behind graph/VPS value labels (reference rgba(8,10,15,.58)) -->
+    <SolidColorBrush x:Key="LabelChipBackgroundBrush" Color="#94080A0F" />
 
     <!-- Accents (iOS-12 dark system colors) -->
     <SolidColorBrush x:Key="AccentGreenBrush" Color="#30D158" />
@@ -98,14 +101,14 @@
         </Setter>
     </Style>
 
-    <!-- TabView tab surfaces (Main/Conf) -->
-    <SolidColorBrush x:Key="TabSeparatorBrush" Color="#24FFFFFF" />
-    <SolidColorBrush x:Key="TabInactiveSurfaceBrush" Color="#07FFFFFF" />
-    <SolidColorBrush x:Key="TabInactiveBorderBrush" Color="#12FFFFFF" />
-    <SolidColorBrush x:Key="TabActiveBorderBrush" Color="#22FFFFFF" />
+    <!-- TabView tab surfaces (Main/Bridges/Config): navy, matching the window/panels -->
+    <SolidColorBrush x:Key="TabSeparatorBrush" Color="#263247" />
+    <SolidColorBrush x:Key="TabInactiveSurfaceBrush" Color="#0C1420" />
+    <SolidColorBrush x:Key="TabInactiveBorderBrush" Color="#1E2A3C" />
+    <SolidColorBrush x:Key="TabActiveBorderBrush" Color="#2E3F5A" />
     <LinearGradientBrush x:Key="TabActiveSurfaceBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#1E2128" Offset="0" />
-        <GradientStop Color="#181B21" Offset="1" />
+        <GradientStop Color="#17202E" Offset="0" />
+        <GradientStop Color="#101722" Offset="1" />
     </LinearGradientBrush>
 
     <!-- TabView tab (Main/Conf): top-rounded, bordered top+sides only, joins the content separator below -->
@@ -162,15 +165,15 @@
 
     <!-- iOS sliding switch (Tor / mihomo) -->
     <Style x:Key="BinaryToggleStyle" TargetType="ToggleButton">
-        <Setter Property="Width" Value="46" />
-        <Setter Property="Height" Value="26" />
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="28" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
-                    <Border x:Name="Track" Background="{StaticResource ToggleTrackBrush}" CornerRadius="13">
+                    <Border x:Name="Track" Background="{StaticResource ToggleTrackBrush}" CornerRadius="14">
                         <Grid Margin="1,0">
-                            <Ellipse x:Name="Knob" Width="24" Height="24" HorizontalAlignment="Left" Fill="White">
+                            <Ellipse x:Name="Knob" Width="26" Height="26" HorizontalAlignment="Left" Fill="#E6EAF0">
                                 <Ellipse.Effect>
                                     <DropShadowEffect BlurRadius="3" ShadowDepth="1" Opacity="0.35" Color="Black" />
                                 </Ellipse.Effect>
@@ -197,6 +200,13 @@
         <Setter Property="BorderBrush" Value="{StaticResource PanelBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}" />
+    </Style>
+
+    <!-- Translucent chip behind graph / VPS value labels -->
+    <Style x:Key="GraphValueChipStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource LabelChipBackgroundBrush}" />
+        <Setter Property="CornerRadius" Value="3" />
+        <Setter Property="Padding" Value="3,0" />
     </Style>
 
     <!-- Status card tile (5-card row): reference 84x40, radius 6 -->

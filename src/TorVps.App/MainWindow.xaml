@@ -43,22 +43,14 @@
             </Grid>
         </Border>
 
-        <!-- Tor / mihomo toggles: top block, above the Main/Conf tabs -->
+        <!-- Tor / mihomo toggles: top block, above the Main/Conf tabs; right-aligned -->
         <Border Grid.Row="1" Style="{StaticResource PanelBorderStyle}" Height="34" Margin="0,4,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Text="Tor:" FontSize="11" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                    <ToggleButton Style="{StaticResource BinaryToggleStyle}" IsChecked="{Binding TunnelOn, Mode=OneWay}" Command="{Binding ToggleTunnelCommand}" IsEnabled="{Binding TunnelToggleEnabled}" />
-                </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Text="mihomo:" FontSize="11" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                    <ToggleButton Style="{StaticResource BinaryToggleStyle}" IsChecked="{Binding MihomoOn, Mode=OneWay}" Command="{Binding ToggleMihomoCommand}" IsEnabled="{Binding MihomoToggleEnabled}" />
-                </StackPanel>
-            </Grid>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0">
+                <TextBlock Text="Tor:" FontSize="11" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <ToggleButton Style="{StaticResource BinaryToggleStyle}" IsChecked="{Binding TunnelOn, Mode=OneWay}" Command="{Binding ToggleTunnelCommand}" IsEnabled="{Binding TunnelToggleEnabled}" />
+                <TextBlock Text="mihomo:" FontSize="11" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="24,0,8,0" />
+                <ToggleButton Style="{StaticResource BinaryToggleStyle}" IsChecked="{Binding MihomoOn, Mode=OneWay}" Command="{Binding ToggleMihomoCommand}" IsEnabled="{Binding MihomoToggleEnabled}" />
+            </StackPanel>
         </Border>
 
         <!-- Toolbar: TabView tabs (Main/Conf) joined to a separator line -->
@@ -119,23 +111,35 @@
                                 <Polyline Points="{Binding PingAreaPoints}" Stroke="{StaticResource PingSeriesBrush}" StrokeThickness="1" />
                             </Canvas>
                         </Viewbox>
-                        <!-- Speed labels: max / cur / avg (↓ down, ↑ up) -->
+                        <!-- Speed labels: max / cur / avg (↓ down, ↑ up), each on a translucent chip -->
                         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
-                            <TextBlock FontSize="9">
-                                <Run Foreground="#74F59A" Text="↓" /><Run Foreground="#74F59A" Text="{Binding DownPeakText, Mode=OneWay}" /><Run Text="  " /><Run Foreground="#40C8FF" Text="↑" /><Run Foreground="#40C8FF" Text="{Binding UpPeakText, Mode=OneWay}" />
-                            </TextBlock>
-                            <TextBlock FontSize="9" Margin="0,2,0,0">
-                                <Run Foreground="#74F59A" Text="↓" /><Run Foreground="#74F59A" Text="{Binding DownCurrentText, Mode=OneWay}" /><Run Text="  " /><Run Foreground="#40C8FF" Text="↑" /><Run Foreground="#40C8FF" Text="{Binding UpCurrentText, Mode=OneWay}" />
-                            </TextBlock>
-                            <TextBlock FontSize="9" Margin="0,2,0,0">
-                                <Run Foreground="#74F59A" Text="↓" /><Run Foreground="#74F59A" Text="{Binding DownAverageText, Mode=OneWay}" /><Run Text="  " /><Run Foreground="#40C8FF" Text="↑" /><Run Foreground="#40C8FF" Text="{Binding UpAverageText, Mode=OneWay}" />
-                            </TextBlock>
+                            <Border Style="{StaticResource GraphValueChipStyle}" HorizontalAlignment="Left">
+                                <TextBlock FontSize="9">
+                                    <Run Foreground="#74F59A" Text="↓" /><Run Foreground="#74F59A" Text="{Binding DownPeakText, Mode=OneWay}" /><Run Text="  " /><Run Foreground="#40C8FF" Text="↑" /><Run Foreground="#40C8FF" Text="{Binding UpPeakText, Mode=OneWay}" />
+                                </TextBlock>
+                            </Border>
+                            <Border Style="{StaticResource GraphValueChipStyle}" HorizontalAlignment="Left" Margin="0,2,0,0">
+                                <TextBlock FontSize="9">
+                                    <Run Foreground="#74F59A" Text="↓" /><Run Foreground="#74F59A" Text="{Binding DownCurrentText, Mode=OneWay}" /><Run Text="  " /><Run Foreground="#40C8FF" Text="↑" /><Run Foreground="#40C8FF" Text="{Binding UpCurrentText, Mode=OneWay}" />
+                                </TextBlock>
+                            </Border>
+                            <Border Style="{StaticResource GraphValueChipStyle}" HorizontalAlignment="Left" Margin="0,2,0,0">
+                                <TextBlock FontSize="9">
+                                    <Run Foreground="#74F59A" Text="↓" /><Run Foreground="#74F59A" Text="{Binding DownAverageText, Mode=OneWay}" /><Run Text="  " /><Run Foreground="#40C8FF" Text="↑" /><Run Foreground="#40C8FF" Text="{Binding UpAverageText, Mode=OneWay}" />
+                                </TextBlock>
+                            </Border>
                         </StackPanel>
-                        <!-- Ping labels: max / cur / avg -->
+                        <!-- Ping labels: max / cur / avg, each on a translucent chip -->
                         <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top">
-                            <TextBlock FontSize="9" HorizontalAlignment="Right" Foreground="{StaticResource PingSeriesBrush}" Text="{Binding PingPeakText, Mode=OneWay}" />
-                            <TextBlock FontSize="9" HorizontalAlignment="Right" Margin="0,2,0,0" Foreground="{StaticResource PingSeriesBrush}" Text="{Binding PingCurrentText, Mode=OneWay}" />
-                            <TextBlock FontSize="9" HorizontalAlignment="Right" Margin="0,2,0,0" Foreground="{StaticResource PingSeriesBrush}" Text="{Binding PingAverageText, Mode=OneWay}" />
+                            <Border Style="{StaticResource GraphValueChipStyle}" HorizontalAlignment="Right">
+                                <TextBlock FontSize="9" Foreground="{StaticResource PingSeriesBrush}" Text="{Binding PingPeakText, Mode=OneWay}" />
+                            </Border>
+                            <Border Style="{StaticResource GraphValueChipStyle}" HorizontalAlignment="Right" Margin="0,2,0,0">
+                                <TextBlock FontSize="9" Foreground="{StaticResource PingSeriesBrush}" Text="{Binding PingCurrentText, Mode=OneWay}" />
+                            </Border>
+                            <Border Style="{StaticResource GraphValueChipStyle}" HorizontalAlignment="Right" Margin="0,2,0,0">
+                                <TextBlock FontSize="9" Foreground="{StaticResource PingSeriesBrush}" Text="{Binding PingAverageText, Mode=OneWay}" />
+                            </Border>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -183,18 +187,18 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="VPS" FontSize="10" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
                             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock FontSize="10" Foreground="{StaticResource CpuSeriesBrush}">
-                                    <Run Text="CPU " /><Run Text="{Binding VpsCpuText, Mode=OneWay}" />
-                                </TextBlock>
-                                <TextBlock FontSize="10" Foreground="{StaticResource MemSeriesBrush}" Margin="10,0,0,0">
-                                    <Run Text="RAM " /><Run Text="{Binding VpsRamText, Mode=OneWay}" />
-                                </TextBlock>
-                                <TextBlock FontSize="10" Foreground="{StaticResource DownSeriesBrush}" Margin="10,0,0,0">
-                                    <Run Text="↓" /><Run Text="{Binding VpsDownCurrentText, Mode=OneWay}" />
-                                </TextBlock>
-                                <TextBlock FontSize="10" Foreground="{StaticResource UpSeriesBrush}" Margin="8,0,0,0">
-                                    <Run Text="↑" /><Run Text="{Binding VpsUpCurrentText, Mode=OneWay}" />
-                                </TextBlock>
+                                <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
+                                    <TextBlock FontSize="10" Foreground="{StaticResource CpuSeriesBrush}"><Run Text="CPU " /><Run Text="{Binding VpsCpuText, Mode=OneWay}" /></TextBlock>
+                                </Border>
+                                <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
+                                    <TextBlock FontSize="10" Foreground="{StaticResource MemSeriesBrush}"><Run Text="RAM " /><Run Text="{Binding VpsRamText, Mode=OneWay}" /></TextBlock>
+                                </Border>
+                                <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
+                                    <TextBlock FontSize="10" Foreground="{StaticResource DownSeriesBrush}"><Run Text="↓" /><Run Text="{Binding VpsDownCurrentText, Mode=OneWay}" /></TextBlock>
+                                </Border>
+                                <Border Style="{StaticResource GraphValueChipStyle}">
+                                    <TextBlock FontSize="10" Foreground="{StaticResource UpSeriesBrush}"><Run Text="↑" /><Run Text="{Binding VpsUpCurrentText, Mode=OneWay}" /></TextBlock>
+                                </Border>
                             </StackPanel>
                             <Viewbox Grid.Column="3" Stretch="Fill" Height="24">
                                 <Canvas Width="260" Height="24" Background="Transparent" ClipToBounds="True">
