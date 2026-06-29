@@ -30,10 +30,10 @@
     <SolidColorBrush x:Key="SeparatorBrush" Color="#263247" />
     <!-- Off (inactive) toggle track: the darkest tone in the window -->
     <SolidColorBrush x:Key="ToggleTrackBrush" Color="#080B12" />
-    <!-- On toggle track: same muted green tint as the status blocks (not the bright accent green) -->
+    <!-- On toggle track: a green in the block family but ~2x lighter than the card tint -->
     <LinearGradientBrush x:Key="ToggleOnTrackBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#3D30D158" Offset="0" />
-        <GradientStop Color="#2630D158" Offset="1" />
+        <GradientStop Color="#7A30D158" Offset="0" />
+        <GradientStop Color="#4C30D158" Offset="1" />
     </LinearGradientBrush>
     <SolidColorBrush x:Key="TabTrackBrush" Color="#111927" />
 
@@ -171,7 +171,7 @@
     <!-- iOS sliding switch (Tor / mihomo): knob is larger than the track and protrudes ~1px all around -->
     <Style x:Key="BinaryToggleStyle" TargetType="ToggleButton">
         <Setter Property="Width" Value="42" />
-        <Setter Property="Height" Value="24" />
+        <Setter Property="Height" Value="28" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
