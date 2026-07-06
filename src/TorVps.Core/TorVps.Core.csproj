@@ -9,7 +9,7 @@
     <!-- Managed TLS 1.3 (see ManagedTls): the Glances endpoint is TLS 1.3-only and Windows 10's
          Schannel, which .NET's HttpClient uses, has no TLS 1.3 client. -->
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.5.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
     <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 </Project>
