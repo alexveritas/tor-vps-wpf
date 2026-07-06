@@ -11,7 +11,7 @@ public partial class DashboardViewModel
         bool socksOpen,
         bool ctrlPortOpen,
         bool mihomoAlive,
-        IReadOnlyList<BridgeRecord> bridgeRecords,
+        BridgeAvailabilityReport bridgeReport,
         AppConfig config,
         IReadOnlyList<string> logLines)
     {
@@ -38,7 +38,6 @@ public partial class DashboardViewModel
             new CardState { Title = "Onion VPS", State = onionState, Text = onionText },
         });
 
-        var activeBridgeCount = bridgeRecords.Count(b => b.State == HealthState.Ok);
         var onionMs = _onionProbe?.Success == true ? _onionProbe.ElapsedMs : (double?)null;
         var chainMs = _chainProbe?.Success == true ? _chainProbe.ElapsedMs : (double?)null;
         var ping = onionMs ?? chainMs ?? 0.0;
@@ -89,8 +88,17 @@ public partial class DashboardViewModel
             new HealthChip
             {
                 Label = "Bridges",
-                State = activeBridgeCount > 0 ? HealthState.Ok : config.BridgeCount > 0 ? HealthState.Warn : HealthState.Error,
-                Text = $"{config.BridgeCount}/{activeBridgeCount}",
+                State = bridgeReport.RedCount > 0 ? HealthState.Error
+                    : bridgeReport.YellowCount > 0 ? HealthState.Warn
+                    : bridgeReport.GreenCount > 0 ? HealthState.Ok
+                    : config.BridgeCount > 0 ? HealthState.Warn : HealthState.Error,
+                Text = $"{bridgeReport.GreenCount}/{bridgeReport.YellowCount}/{bridgeReport.RedCount}",
+                Segments = new[]
+                {
+                    new HealthSegment { Text = bridgeReport.GreenCount.ToString(), State = HealthState.Ok },
+                    new HealthSegment { Text = bridgeReport.YellowCount.ToString(), State = HealthState.Warn },
+                    new HealthSegment { Text = bridgeReport.RedCount.ToString(), State = HealthState.Error },
+                },
             },
             new HealthChip
             {

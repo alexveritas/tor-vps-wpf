@@ -28,6 +28,7 @@ public partial class DashboardViewModel : ObservableObject
     private readonly IVpsMonitorService _vpsMonitorService;
     private readonly ILogService _logService;
     private readonly IConfigCheckService _configCheckService;
+    private readonly IBridgeAvailabilityMonitor _bridgeMonitor;
     private readonly DispatcherTimer _refreshTimer;
 
     private readonly Queue<GraphHistoryPoint> _graphHistory = new();
@@ -54,7 +55,8 @@ public partial class DashboardViewModel : ObservableObject
         ISocks5Probe socksProbe,
         IVpsMonitorService vpsMonitorService,
         ILogService logService,
-        IConfigCheckService configCheckService)
+        IConfigCheckService configCheckService,
+        IBridgeAvailabilityMonitor bridgeMonitor)
     {
         _torService = torService;
         _mihomoService = mihomoService;
@@ -63,6 +65,7 @@ public partial class DashboardViewModel : ObservableObject
         _vpsMonitorService = vpsMonitorService;
         _logService = logService;
         _configCheckService = configCheckService;
+        _bridgeMonitor = bridgeMonitor;
 
         _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _refreshTimer.Tick += async (_, _) => await RefreshAsync();
@@ -123,6 +126,11 @@ public partial class DashboardViewModel : ObservableObject
 
     [ObservableProperty]
     private HealthState _confTabState = HealthState.Unknown;
+
+    [ObservableProperty] private int _bridgeGreenCount;
+    [ObservableProperty] private int _bridgeYellowCount;
+    [ObservableProperty] private int _bridgeRedCount;
+    [ObservableProperty] private int _bridgeGrayCount;
 
     public ObservableCollection<CardState> Cards { get; } = new();
     public ObservableCollection<HealthChip> Health { get; } = new();
@@ -291,13 +299,23 @@ public partial class DashboardViewModel : ObservableObject
 
             var bridgesPath = Path.Combine(BaseDirectory, "bridges.txt");
             var bridgesText = File.Exists(bridgesPath) ? await File.ReadAllTextAsync(bridgesPath) : string.Empty;
-            var failed = ConfigParser.ParseFailedFromLogs(logLines);
+            // Failed = guards Tor reports as down/unusable, plus anything flagged failing in the logs.
+            var failed = ConfigParser.ParseFailedFromLogs(logLines).Concat(controlStatus.DownGuardFingerprints).ToList();
             var bridgeRecords = ConfigParser.ParseBridges(bridgesText, controlStatus.ActiveGuardFingerprints, failed);
 
-            UpdateCardsAndHealth(torAlive, bootstrap, controlStatus, socksOpen, ctrlPortOpen, mihomoAlive, bridgeRecords, config, logLines);
+            // Only fold bridge reachability into the running stats when Tor is fully working and its guard status is
+            // readable — otherwise a down/bootstrapping Tor would wrongly mark every bridge as unreachable.
+            var torHealthy = torAlive && bootstrap >= 100.0 && controlStatus.ControlAuthOk;
+            var bridgeReport = _bridgeMonitor.Update(bridgeRecords, torHealthy);
+            BridgeGreenCount = bridgeReport.GreenCount;
+            BridgeYellowCount = bridgeReport.YellowCount;
+            BridgeRedCount = bridgeReport.RedCount;
+            BridgeGrayCount = bridgeReport.GrayCount;
+
+            UpdateCardsAndHealth(torAlive, bootstrap, controlStatus, socksOpen, ctrlPortOpen, mihomoAlive, bridgeReport, config, logLines);
             RecordGraphHistory(torAlive, controlStatus.DownMbit, controlStatus.UpMbit, config.MonitorIntervalSec);
 
-            ReplaceAll(Bridges, bridgeRecords);
+            ReplaceAll(Bridges, bridgeReport.Bridges);
             ReplaceAll(LogLines, logLines);
             ReplaceAll(Checks, _configCheckService.Run(config));
             UpdateConfTabStatus();

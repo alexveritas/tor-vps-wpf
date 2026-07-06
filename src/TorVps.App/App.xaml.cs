@@ -23,6 +23,7 @@ public partial class App : Application
         services.AddSingleton<IWindowsProxyService, WindowsProxyService>();
         services.AddSingleton<ISocks5Probe, Socks5Probe>();
         services.AddSingleton<ITorControlClient, TorControlClient>();
+        services.AddSingleton<IBridgeAvailabilityMonitor, BridgeAvailabilityMonitor>();
         // The Glances endpoint is TLS 1.3-only; give the monitor its own managed-TLS client (Win10 Schannel can't do TLS 1.3).
         services.AddSingleton<IVpsMonitorService>(_ => new VpsMonitorService(ManagedTls.CreateHttpClient()));
         services.AddSingleton<IMihomoService, MihomoService>();

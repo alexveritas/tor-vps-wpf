@@ -113,8 +113,24 @@
                             <Border Style="{StaticResource HealthChipBorderStyle}" Background="{Binding State, Converter={StaticResource HealthStateToBackgroundBrushConverter}}">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding Label}" FontSize="9" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" />
+                                    <!-- Plain value (hidden when a colored breakdown is present, e.g. the Bridges chip) -->
                                     <TextBlock Text="{Binding Text}" FontSize="9" Margin="4,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                               Visibility="{Binding Segments, Converter={StaticResource NullToVisibilityConverter}}"
                                                Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
+                                    <!-- Colored green/yellow/red breakdown (bridge availability) -->
+                                    <ItemsControl ItemsSource="{Binding Segments}" Margin="4,0,0,0" VerticalAlignment="Center" Focusable="False">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Text}" FontSize="9" Margin="0,0,3,0" VerticalAlignment="Center"
+                                                           Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
@@ -243,7 +259,31 @@
 
             <!-- ===================== BRIDGES TAB ===================== -->
             <Grid Visibility="{Binding IsBridgesTab, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Border Style="{StaticResource PanelBorderStyle}" Padding="6,4,0,4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Availability summary accumulated while Tor is healthy -->
+                <Border Grid.Row="0" Style="{StaticResource PanelBorderStyle}" Padding="8,5" Margin="0,0,0,4">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Availability" FontSize="10" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                        <TextBlock FontSize="10" VerticalAlignment="Center" Margin="0,0,14,0">
+                            <Run Text="●" Foreground="#30D158" /><Run Text=" " /><Run Text="{Binding BridgeGreenCount, Mode=OneWay}" Foreground="#30D158" /><Run Text=" always" Foreground="{StaticResource TextDimBrush}" />
+                        </TextBlock>
+                        <TextBlock FontSize="10" VerticalAlignment="Center" Margin="0,0,14,0">
+                            <Run Text="●" Foreground="#FFD60A" /><Run Text=" " /><Run Text="{Binding BridgeYellowCount, Mode=OneWay}" Foreground="#FFD60A" /><Run Text=" flaky" Foreground="{StaticResource TextDimBrush}" />
+                        </TextBlock>
+                        <TextBlock FontSize="10" VerticalAlignment="Center" Margin="0,0,14,0">
+                            <Run Text="●" Foreground="#FF453A" /><Run Text=" " /><Run Text="{Binding BridgeRedCount, Mode=OneWay}" Foreground="#FF453A" /><Run Text=" down" Foreground="{StaticResource TextDimBrush}" />
+                        </TextBlock>
+                        <TextBlock FontSize="10" VerticalAlignment="Center">
+                            <Run Text="●" Foreground="#A1A1A8" /><Run Text=" " /><Run Text="{Binding BridgeGrayCount, Mode=OneWay}" Foreground="#A1A1A8" /><Run Text=" unused" Foreground="{StaticResource TextDimBrush}" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Style="{StaticResource PanelBorderStyle}" Padding="6,4,0,4">
                     <ScrollViewer Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding Bridges}" Focusable="False">
                             <ItemsControl.ItemsPanel>
