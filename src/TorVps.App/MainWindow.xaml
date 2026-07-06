@@ -167,31 +167,52 @@
                     </Grid>
                 </Border>
 
-                <!-- 4. VPS compact metrics row + sparkline -->
-                <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Height="44" Margin="0,0,0,4" Padding="8,2" ToolTip="{Binding ServerTooltip}">
-                    <Grid VerticalAlignment="Center">
+                <!-- 4. VPS metrics table (2 rows) + sparkline, mirroring the reference ServerGraphPanel:
+                       VPS  CPU: {cpu}%   {downCur} ↓ {downPeak}
+                            RAM: {ram}%   {upCur}   ↑ {upPeak}   | graph fills the rest -->
+                <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Height="44" Margin="0,0,0,4" Padding="8,4" ToolTip="{Binding ServerTooltip}">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="130" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="VPS" FontSize="10" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
-                                <TextBlock FontSize="10" Foreground="{StaticResource CpuSeriesBrush}"><Run Text="CPU " /><Run Text="{Binding VpsCpuText, Mode=OneWay}" /></TextBlock>
-                            </Border>
-                            <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
-                                <TextBlock FontSize="10" Foreground="{StaticResource MemSeriesBrush}"><Run Text="RAM " /><Run Text="{Binding VpsRamText, Mode=OneWay}" /></TextBlock>
-                            </Border>
-                            <Border Style="{StaticResource GraphValueChipStyle}" Margin="0,0,6,0">
-                                <TextBlock FontSize="10" Foreground="{StaticResource DownSeriesBrush}"><Run Text="↓" /><Run Text="{Binding VpsDownCurrentText, Mode=OneWay}" /></TextBlock>
-                            </Border>
-                            <Border Style="{StaticResource GraphValueChipStyle}">
-                                <TextBlock FontSize="10" Foreground="{StaticResource UpSeriesBrush}"><Run Text="↑" /><Run Text="{Binding VpsUpCurrentText, Mode=OneWay}" /></TextBlock>
-                            </Border>
-                        </StackPanel>
-                        <Viewbox Grid.Column="3" Stretch="Fill" Height="24">
+
+                        <!-- Aligned metrics table: label | %value | current | arrow | peak -->
+                        <Grid Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="28" />
+                                <ColumnDefinition Width="6" />
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="30" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="17" />
+                                <RowDefinition Height="17" />
+                            </Grid.RowDefinitions>
+
+                            <!-- VPS panel label (top-left cell) -->
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="VPS" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" />
+
+                            <!-- Row 1: CPU + download current/peak -->
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="CPU:" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource CpuSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding VpsCpuText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource CpuSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="0" Grid.Column="4" Text="{Binding VpsDownCurrentText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource DownSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="0" Grid.Column="5" Text="↓" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource DownSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="0" Grid.Column="6" Text="{Binding VpsDownPeakText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource DownSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+
+                            <!-- Row 2: RAM + upload current/peak -->
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="RAM:" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource MemSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding VpsRamText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource MemSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding VpsUpCurrentText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource UpSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="5" Text="↑" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource UpSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="6" Text="{Binding VpsUpPeakText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource UpSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Sparkline fills the remaining width (Canvas height stays 24 = VpsGraphLogicalHeight) -->
+                        <Viewbox Grid.Column="1" Stretch="Fill" Height="32" VerticalAlignment="Center">
                             <Canvas Width="260" Height="24" Background="Transparent" ClipToBounds="True">
                                 <Polygon Points="{Binding VpsDownFillPoints}" Fill="{StaticResource DownAreaFillBrush}" />
                                 <Polygon Points="{Binding VpsUpFillPoints}" Fill="{StaticResource UpAreaFillBrush}" />
