@@ -8,6 +8,7 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>TorVps</AssemblyName>
     <RootNamespace>TorVps.App</RootNamespace>
+    <ApplicationIcon>tor_onion.ico</ApplicationIcon>
     <Version>0.34.0</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <PublishSingleFile>true</PublishSingleFile>
@@ -21,6 +22,10 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Embedded so Window.Icon can load it at runtime (taskbar / Alt+Tab) -->
+    <Resource Include="tor_onion.ico" />
   </ItemGroup>
 
   <Target Name="SetInformationalVersion" BeforeTargets="GetAssemblyVersion;GenerateAssemblyInfo">

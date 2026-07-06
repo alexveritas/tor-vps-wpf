@@ -100,10 +100,14 @@ public partial class DashboardViewModel : ObservableObject
     private bool _rulesUpdating;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsConfTab))]
-    private bool _isMainTab = true;
+    [NotifyPropertyChangedFor(nameof(IsMainTab))]
+    [NotifyPropertyChangedFor(nameof(IsBridgesTab))]
+    [NotifyPropertyChangedFor(nameof(IsConfigTab))]
+    private DashboardTab _selectedTab = DashboardTab.Main;
 
-    public bool IsConfTab => !IsMainTab;
+    public bool IsMainTab => SelectedTab == DashboardTab.Main;
+    public bool IsBridgesTab => SelectedTab == DashboardTab.Bridges;
+    public bool IsConfigTab => SelectedTab == DashboardTab.Config;
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
@@ -125,6 +129,7 @@ public partial class DashboardViewModel : ObservableObject
     public ObservableCollection<BridgeRecord> Bridges { get; } = new();
     public ObservableCollection<string> LogLines { get; } = new();
     public ObservableCollection<ConfigCheck> Checks { get; } = new();
+    public ObservableCollection<ConfigCheckGroup> CheckGroups { get; } = new();
 
     [ObservableProperty]
     private PointCollection _downAreaPoints = new();
@@ -140,6 +145,21 @@ public partial class DashboardViewModel : ObservableObject
 
     [ObservableProperty]
     private PointCollection _vpsUpAreaPoints = new();
+
+    [ObservableProperty]
+    private PointCollection _downFillPoints = new();
+
+    [ObservableProperty]
+    private PointCollection _upFillPoints = new();
+
+    [ObservableProperty]
+    private PointCollection _pingFillPoints = new();
+
+    [ObservableProperty]
+    private PointCollection _vpsDownFillPoints = new();
+
+    [ObservableProperty]
+    private PointCollection _vpsUpFillPoints = new();
 
     [ObservableProperty] private string _downPeakText = "0.00";
     [ObservableProperty] private string _downCurrentText = "0.00";
@@ -207,10 +227,13 @@ public partial class DashboardViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ShowMainTab() => IsMainTab = true;
+    private void ShowMainTab() => SelectedTab = DashboardTab.Main;
 
     [RelayCommand]
-    private void ShowConfTab() => IsMainTab = false;
+    private void ShowBridgesTab() => SelectedTab = DashboardTab.Bridges;
+
+    [RelayCommand]
+    private void ShowConfigTab() => SelectedTab = DashboardTab.Config;
 
     [RelayCommand]
     private async Task UpdateRulesAsync()
@@ -229,6 +252,9 @@ public partial class DashboardViewModel : ObservableObject
             RulesUpdating = false;
         }
     }
+
+    [RelayCommand]
+    private async Task RecheckConfigAsync() => await RefreshAsync();
 
     private async Task RefreshAsync()
     {
@@ -275,6 +301,7 @@ public partial class DashboardViewModel : ObservableObject
             ReplaceAll(LogLines, logLines);
             ReplaceAll(Checks, _configCheckService.Run(config));
             UpdateConfTabStatus();
+            UpdateCheckGroups();
 
             TunnelOn = torAlive;
             MihomoOn = mihomoAlive;

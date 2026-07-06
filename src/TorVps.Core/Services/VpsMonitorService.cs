@@ -7,7 +7,8 @@ using TorVps.Core.Models;
 namespace TorVps.Core.Services;
 
 /// <summary>Polls a remote Glances API (CPU/RAM/network) over HTTP Basic auth.</summary>
-public sealed class VpsMonitorService : IVpsMonitorService
+/// <remarks>The endpoint is TLS 1.3-only, so this expects an HttpClient built by <see cref="ManagedTls"/>.</remarks>
+public sealed class VpsMonitorService : IVpsMonitorService, IDisposable
 {
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(10);
 
@@ -18,6 +19,8 @@ public sealed class VpsMonitorService : IVpsMonitorService
         _httpClient = httpClient;
     }
 
+    public void Dispose() => _httpClient.Dispose();
+
     public async Task<ServerMetrics> FetchAsync(AppConfig config, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(config.MonitorPassword))
@@ -27,13 +30,16 @@ public sealed class VpsMonitorService : IVpsMonitorService
 
         try
         {
-            var cpuJson = await GetJsonAsync(config, "/api/4/cpu", cancellationToken).ConfigureAwait(false);
-            var memJson = await GetJsonAsync(config, "/api/4/mem", cancellationToken).ConfigureAwait(false);
-            var netJson = await GetJsonAsync(config, "/api/4/network", cancellationToken).ConfigureAwait(false);
+            // Each call uses its own fresh TLS connection (managed TLS isn't pooled), so run them concurrently
+            // to keep a poll to roughly one handshake instead of three sequential ones.
+            var cpuTask = GetJsonAsync(config, "/api/4/cpu", cancellationToken);
+            var memTask = GetJsonAsync(config, "/api/4/mem", cancellationToken);
+            var netTask = GetJsonAsync(config, "/api/4/network", cancellationToken);
+            await Task.WhenAll(cpuTask, memTask, netTask).ConfigureAwait(false);
 
-            var cpu = PickCpuPercent(cpuJson);
-            var mem = PickMemPercent(memJson);
-            var (down, up, iface) = CalcServerNetSpeed(netJson, config.MonitorNetworkInterface);
+            var cpu = PickCpuPercent(await cpuTask.ConfigureAwait(false));
+            var mem = PickMemPercent(await memTask.ConfigureAwait(false));
+            var (down, up, iface) = CalcServerNetSpeed(await netTask.ConfigureAwait(false), config.MonitorNetworkInterface);
             var state = CombineState(PercentState(cpu), PercentState(mem));
 
             return new ServerMetrics { Ok = true, State = state, Down = down, Up = up, Cpu = cpu, Mem = mem, Iface = iface };
@@ -50,8 +56,12 @@ public sealed class VpsMonitorService : IVpsMonitorService
 
     private async Task<JsonElement> GetJsonAsync(AppConfig config, string path, CancellationToken cancellationToken)
     {
-        var url = config.MonitorBaseUrl.TrimEnd('/') + path;
+        // http:// scheme: TLS is performed inside the ManagedTls connect callback, not by HttpClient (Schannel).
+        var url = ManagedTls.ToPlaintextScheme(config.MonitorBaseUrl.TrimEnd('/')) + path;
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        // A fresh connection per request: the managed-TLS (BouncyCastle) stream is not reused across
+        // pooled keep-alive requests, so force close to run the TLS handshake anew each call.
+        request.Headers.ConnectionClose = true;
         request.Headers.UserAgent.ParseAdd("TorVps-Dashboard/1.0");
         var token = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{config.MonitorUsername}:{config.MonitorPassword}"));
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", token);

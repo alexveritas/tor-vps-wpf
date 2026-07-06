@@ -2,62 +2,98 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <!-- ============================================================= -->
+    <!--  DESIGN TOKENS  (iOS-12 Dark)                                  -->
+    <!--  Single source of truth for the whole skin. Components below   -->
+    <!--  reference these; views should not hard-code colors/sizes.     -->
+    <!-- ============================================================= -->
+
     <FontFamily x:Key="AppFont">Segoe UI Variable Text, Segoe UI</FontFamily>
 
+    <!-- Corner radii -->
+    <CornerRadius x:Key="RadiusLarge">14</CornerRadius>
+    <CornerRadius x:Key="RadiusMedium">10</CornerRadius>
+    <CornerRadius x:Key="RadiusSmall">6</CornerRadius>
+    <CornerRadius x:Key="RadiusPill">13</CornerRadius>
+
+    <!-- Surfaces (reference navy theme: body #070a10, shell #0b1018, panel #101722) -->
     <LinearGradientBrush x:Key="WindowBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#0D0D10" Offset="0" />
-        <GradientStop Color="#070709" Offset="1" />
+        <GradientStop Color="#0B1018" Offset="0" />
+        <GradientStop Color="#080B12" Offset="1" />
     </LinearGradientBrush>
+    <SolidColorBrush x:Key="TitlebarBackgroundBrush" Color="#0B1018" />
+    <SolidColorBrush x:Key="TitlebarBorderBrush" Color="#202938" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#101722" />
+    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="#16202E" />
+    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#101722" />
+    <SolidColorBrush x:Key="PanelBorderBrush" Color="#263247" />
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#263247" />
+    <!-- Off (inactive) toggle track: the darkest tone in the window -->
+    <SolidColorBrush x:Key="ToggleTrackBrush" Color="#080B12" />
+    <!-- On toggle track: a green in the block family but ~2x lighter than the card tint -->
+    <LinearGradientBrush x:Key="ToggleOnTrackBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#7A30D158" Offset="0" />
+        <GradientStop Color="#4C30D158" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="TabTrackBrush" Color="#111927" />
 
-    <Style TargetType="TextBlock">
-        <Setter Property="Foreground" Value="#F5F5F7" />
-    </Style>
-
-    <SolidColorBrush x:Key="TitlebarBackgroundBrush" Color="#0F1117" />
-    <SolidColorBrush x:Key="TitlebarBorderBrush" Color="#1FFFFFFF" />
-    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#DC1C1C1E" />
-    <SolidColorBrush x:Key="PanelBorderBrush" Color="#16FFFFFF" />
-    <SolidColorBrush x:Key="ChartPanelBackgroundBrush" Color="#FF121216" />
-    <SolidColorBrush x:Key="ToggleTrackBrush" Color="#FF111114" />
-    <SolidColorBrush x:Key="ToggleBorderBrush" Color="#1FFFFFFF" />
-
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F5F5F7" />
-    <SolidColorBrush x:Key="TextMutedBrush" Color="#A1A1A8" />
+    <!-- Text -->
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#EAF1FF" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#8E8E93" />
     <SolidColorBrush x:Key="TextDimBrush" Color="#9EB4D3" />
+    <!-- Brighter, heavier grey used for block/card/chip names (matches reference #aeb9ca) -->
+    <SolidColorBrush x:Key="LabelBrightBrush" Color="#AEB9CA" />
+    <!-- Translucent dark chip behind graph/VPS value labels (reference rgba(8,10,15,.58)) -->
+    <SolidColorBrush x:Key="LabelChipBackgroundBrush" Color="#94080A0F" />
 
+    <!-- Accents (iOS-12 dark system colors) -->
     <SolidColorBrush x:Key="AccentGreenBrush" Color="#30D158" />
     <SolidColorBrush x:Key="AccentYellowBrush" Color="#FFD60A" />
     <SolidColorBrush x:Key="AccentRedBrush" Color="#FF453A" />
-    <SolidColorBrush x:Key="AccentGrayBrush" Color="#A1A1A8" />
+    <SolidColorBrush x:Key="AccentGrayBrush" Color="#8E8E93" />
     <SolidColorBrush x:Key="AccentBlueBrush" Color="#0A84FF" />
+    <SolidColorBrush x:Key="AccentOrangeBrush" Color="#FF9F0A" />
     <SolidColorBrush x:Key="OnDarkTextBrush" Color="#03110A" />
+    <SolidColorBrush x:Key="ActiveTabBackgroundBrush" Color="#3A3A3C" />
+    <SolidColorBrush x:Key="ActiveTabForegroundBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ActiveTabBorderBrush" Color="#5C5C60" />
+    <SolidColorBrush x:Key="InactiveTabForegroundBrush" Color="#C7C7CC" />
 
+    <!-- Graph series -->
     <SolidColorBrush x:Key="DownSeriesBrush" Color="#74F59A" />
     <SolidColorBrush x:Key="UpSeriesBrush" Color="#40C8FF" />
     <SolidColorBrush x:Key="PingSeriesBrush" Color="#FF6969" />
     <SolidColorBrush x:Key="CpuSeriesBrush" Color="#FFE4C4" />
     <SolidColorBrush x:Key="MemSeriesBrush" Color="#BF5AF2" />
+    <SolidColorBrush x:Key="GraphGridBrush" Color="#202B3B" />
 
-    <!-- Generic rounded panel used for chart/bridge/health/server/log blocks -->
-    <Style x:Key="PanelBorderStyle" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource PanelBackgroundBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource PanelBorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="14" />
+    <!-- Flat translucent area fills (reference uses uniform fillOpacity ~0.24, not a fade-to-transparent) -->
+    <SolidColorBrush x:Key="DownAreaFillBrush" Color="#3D34C759" />
+    <SolidColorBrush x:Key="UpAreaFillBrush" Color="#3340C8FF" />
+    <SolidColorBrush x:Key="PingAreaFillBrush" Color="#30FF6969" />
+
+    <!-- ============================================================= -->
+    <!--  COMPONENT SKINS                                               -->
+    <!-- ============================================================= -->
+
+    <!-- Default text -->
+    <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
     </Style>
 
+    <!-- Window min/close chrome buttons -->
     <Style x:Key="WindowChromeButtonStyle" TargetType="Button">
-        <Setter Property="Width" Value="32" />
+        <Setter Property="Width" Value="30" />
         <Setter Property="Height" Value="24" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="#B5C5DF" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="8">
+                    <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="7">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -70,62 +106,31 @@
         </Setter>
     </Style>
 
-    <!-- "off / On" pill switch used for the Tor and mihomo toggles -->
-    <Style x:Key="BinaryToggleStyle" TargetType="ToggleButton">
-        <Setter Property="Width" Value="82" />
-        <Setter Property="Height" Value="32" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Border Background="{StaticResource ToggleTrackBrush}" BorderBrush="{StaticResource ToggleBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="3">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Border x:Name="OffPill" Grid.Column="0" CornerRadius="11" Margin="0,0,1,0" Background="Transparent">
-                                <TextBlock x:Name="OffText" Text="off" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="#B8C6D9" />
-                            </Border>
-                            <Border x:Name="OnPill" Grid.Column="1" CornerRadius="11" Margin="1,0,0,0" Background="Transparent">
-                                <TextBlock x:Name="OnText" Text="On" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="#B8C6D9" />
-                            </Border>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="OnPill" Property="Background" Value="{StaticResource AccentGreenBrush}" />
-                            <Setter TargetName="OnText" Property="Foreground" Value="{StaticResource OnDarkTextBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="False">
-                            <Setter TargetName="OffPill" Property="Background" Value="{StaticResource AccentGreenBrush}" />
-                            <Setter TargetName="OffText" Property="Foreground" Value="{StaticResource OnDarkTextBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.56" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+    <!-- TabView tab surfaces (Main/Bridges/Config): navy, matching the window/panels -->
+    <SolidColorBrush x:Key="TabSeparatorBrush" Color="#263247" />
+    <SolidColorBrush x:Key="TabInactiveSurfaceBrush" Color="#0C1420" />
+    <SolidColorBrush x:Key="TabInactiveBorderBrush" Color="#1E2A3C" />
+    <SolidColorBrush x:Key="TabActiveBorderBrush" Color="#2E3F5A" />
+    <LinearGradientBrush x:Key="TabActiveSurfaceBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#17202E" Offset="0" />
+        <GradientStop Color="#101722" Offset="1" />
+    </LinearGradientBrush>
 
-    <!-- Main/Conf tab strip buttons -->
-    <Style x:Key="TabButtonBaseStyle" TargetType="Button">
-        <Setter Property="Height" Value="30" />
-        <Setter Property="MinWidth" Value="58" />
-        <Setter Property="Padding" Value="13,0" />
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="FontWeight" Value="SemiBold" />
+    <!-- TabView tab (Main/Conf): top-rounded, bordered top+sides only, joins the content separator below -->
+    <Style x:Key="TabViewTabBaseStyle" TargetType="Button">
+        <Setter Property="Height" Value="31" />
+        <Setter Property="MinWidth" Value="62" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="FontSize" Value="12" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Background" Value="#FF1B212C" />
-        <Setter Property="Foreground" Value="#9AA4B5" />
-        <Setter Property="BorderBrush" Value="#1AFFFFFF" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="Background" Value="{StaticResource TabInactiveSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TabInactiveBorderBrush}" />
+        <Setter Property="Foreground" Value="#C7C7CC" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="15">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,1,1,0" CornerRadius="10,10,0,0">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
                     </Border>
                 </ControlTemplate>
@@ -133,31 +138,214 @@
         </Setter>
     </Style>
 
-    <Style x:Key="ActionButtonStyle" TargetType="Button" BasedOn="{StaticResource TabButtonBaseStyle}">
-        <Setter Property="Background" Value="{StaticResource AccentGreenBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource OnDarkTextBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource AccentGreenBrush}" />
-        <Setter Property="MinWidth" Value="210" />
-    </Style>
-
-    <Style x:Key="MainTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabButtonBaseStyle}">
+    <Style x:Key="MainTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabViewTabBaseStyle}">
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsMainTab}" Value="True">
-                <Setter Property="Background" Value="{StaticResource AccentBlueBrush}" />
+                <Setter Property="Background" Value="{StaticResource TabActiveSurfaceBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource TabActiveBorderBrush}" />
                 <Setter Property="Foreground" Value="White" />
-                <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="ConfTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabButtonBaseStyle}">
+    <Style x:Key="BridgesTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabViewTabBaseStyle}">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsMainTab}" Value="False">
-                <Setter Property="Background" Value="{StaticResource AccentBlueBrush}" />
+            <DataTrigger Binding="{Binding IsBridgesTab}" Value="True">
+                <Setter Property="Background" Value="{StaticResource TabActiveSurfaceBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource TabActiveBorderBrush}" />
                 <Setter Property="Foreground" Value="White" />
-                <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ConfigTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabViewTabBaseStyle}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsConfigTab}" Value="True">
+                <Setter Property="Background" Value="{StaticResource TabActiveSurfaceBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource TabActiveBorderBrush}" />
+                <Setter Property="Foreground" Value="White" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- iOS sliding switch (Tor / mihomo): knob is larger than the track and protrudes ~1px all around -->
+    <Style x:Key="BinaryToggleStyle" TargetType="ToggleButton">
+        <Setter Property="Width" Value="42" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid>
+                        <!-- Track and knob are siblings so the Border's corner-radius clip never crops the knob -->
+                        <Border x:Name="Track" Height="24" VerticalAlignment="Center" Background="{StaticResource ToggleTrackBrush}" CornerRadius="12" />
+                        <Ellipse x:Name="Knob" Width="26" Height="26" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-1,0,0,0" Fill="{StaticResource TextDimBrush}">
+                            <Ellipse.Effect>
+                                <DropShadowEffect BlurRadius="3" ShadowDepth="1" Opacity="0.35" Color="Black" />
+                            </Ellipse.Effect>
+                        </Ellipse>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Track" Property="Background" Value="{StaticResource ToggleOnTrackBrush}" />
+                            <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
+                            <Setter TargetName="Knob" Property="Margin" Value="0,0,-1,0" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Rounded elevated panel/card -->
+    <Style x:Key="PanelBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource PanelBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource PanelBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}" />
+    </Style>
+
+    <!-- Translucent chip behind graph / VPS value labels -->
+    <Style x:Key="GraphValueChipStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource LabelChipBackgroundBrush}" />
+        <Setter Property="CornerRadius" Value="3" />
+        <Setter Property="Padding" Value="3,0" />
+    </Style>
+
+    <!-- Status card tile (5-card row): reference 84x40, radius 6 -->
+    <Style x:Key="StatusCardBorderStyle" TargetType="Border">
+        <Setter Property="Height" Value="40" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}" />
+        <Setter Property="Margin" Value="2,0" />
+        <Setter Property="Padding" Value="3,0" />
+    </Style>
+
+    <!-- Health chip tile: reference 20px tall, radius 6 -->
+    <Style x:Key="HealthChipBorderStyle" TargetType="Border">
+        <Setter Property="Height" Value="20" />
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusSmall}" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Padding" Value="3,0" />
+    </Style>
+
+    <!-- Filled (green) pill action button -->
+    <Style x:Key="ActionButtonFilledStyle" TargetType="Button">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{StaticResource OnDarkTextBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="{StaticResource RadiusSmall}" Padding="{TemplateBinding Padding}">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#39DF67" Offset="0" />
+                                <GradientStop Color="#30D158" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Opacity" Value="0.9" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bg" Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Ghost (outline) action button -->
+    <Style x:Key="ActionButtonGhostStyle" TargetType="Button">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{StaticResource AccentBlueBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="{StaticResource RadiusSmall}" Background="#142A8DFF"
+                            BorderBrush="#552A8DFF" BorderThickness="1" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#242A8DFF" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Thin scrollbar (reference: 5px, rounded translucent thumb, transparent track) -->
+    <Style x:Key="ThinScrollBarStyle" TargetType="ScrollBar">
+        <Setter Property="Width" Value="5" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Track x:Name="PART_Track" IsDirectionReversed="True">
+                        <Track.Thumb>
+                            <Thumb>
+                                <Thumb.Template>
+                                    <ControlTemplate TargetType="Thumb">
+                                        <Border Background="#57FFFFFF" Width="5" HorizontalAlignment="Center" CornerRadius="2.5" />
+                                    </ControlTemplate>
+                                </Thumb.Template>
+                            </Thumb>
+                        </Track.Thumb>
+                        <Track.DecreaseRepeatButton>
+                            <RepeatButton Opacity="0" Focusable="False" Command="ScrollBar.PageUpCommand" />
+                        </Track.DecreaseRepeatButton>
+                        <Track.IncreaseRepeatButton>
+                            <RepeatButton Opacity="0" Focusable="False" Command="ScrollBar.PageDownCommand" />
+                        </Track.IncreaseRepeatButton>
+                    </Track>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Implicit fallback for any stray ScrollBar -->
+    <Style TargetType="ScrollBar" BasedOn="{StaticResource ThinScrollBarStyle}" />
+
+    <!-- ScrollViewer with a guaranteed thin 5px vertical scrollbar in a 5px gutter -->
+    <Style x:Key="ThinScrollViewerStyle" TargetType="ScrollViewer">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Column="0"
+                                                Margin="{TemplateBinding Padding}"
+                                                CanContentScroll="{TemplateBinding CanContentScroll}" />
+                        <ScrollBar x:Name="PART_VerticalScrollBar" Grid.Column="1"
+                                   Style="{StaticResource ThinScrollBarStyle}" Width="7"
+                                   Orientation="Vertical"
+                                   Minimum="0" Maximum="{TemplateBinding ScrollableHeight}"
+                                   ViewportSize="{TemplateBinding ViewportHeight}"
+                                   Value="{TemplateBinding VerticalOffset}"
+                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

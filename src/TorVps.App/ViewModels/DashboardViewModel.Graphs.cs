@@ -57,6 +57,9 @@ public partial class DashboardViewModel
         DownAreaPoints = BuildPoints(points, p => p.Down, _speedScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
         UpAreaPoints = BuildPoints(points, p => p.Up, _speedScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
         PingAreaPoints = BuildPoints(points, p => p.Ping, _pingScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
+        DownFillPoints = ToAreaPolygon(DownAreaPoints, TopGraphLogicalHeight);
+        UpFillPoints = ToAreaPolygon(UpAreaPoints, TopGraphLogicalHeight);
+        PingFillPoints = ToAreaPolygon(PingAreaPoints, TopGraphLogicalHeight);
 
         var lastValid = validPoints.LastOrDefault();
         DownCurrentText = FormatSpeed(lastValid?.Down ?? 0);
@@ -77,6 +80,8 @@ public partial class DashboardViewModel
 
         VpsDownAreaPoints = BuildPoints(vpsPoints, p => p.Down, _vpsScaleMax, VpsGraphCapacity, VpsGraphLogicalHeight);
         VpsUpAreaPoints = BuildPoints(vpsPoints, p => p.Up, _vpsScaleMax, VpsGraphCapacity, VpsGraphLogicalHeight);
+        VpsDownFillPoints = ToAreaPolygon(VpsDownAreaPoints, VpsGraphLogicalHeight);
+        VpsUpFillPoints = ToAreaPolygon(VpsUpAreaPoints, VpsGraphLogicalHeight);
 
         var lastValidVps = validVps.LastOrDefault();
         VpsCpuText = $"{Math.Round(lastValidVps?.Cpu ?? 0)}%";
@@ -101,6 +106,20 @@ public partial class DashboardViewModel
             collection.Add(new Point(paddingCount + i, (1 - normalized) * logicalHeight));
         }
         return collection;
+    }
+
+    /// <summary>Closes a line's points into a filled area shape by dropping straight down to the baseline and back.</summary>
+    private static PointCollection ToAreaPolygon(PointCollection linePoints, double logicalHeight)
+    {
+        if (linePoints.Count == 0)
+            return new PointCollection();
+
+        var polygon = new PointCollection(linePoints.Count + 2);
+        foreach (var point in linePoints)
+            polygon.Add(point);
+        polygon.Add(new Point(linePoints[^1].X, logicalHeight));
+        polygon.Add(new Point(linePoints[0].X, logicalHeight));
+        return polygon;
     }
 
     private static double NextStableScale(double current, double observed, double floor)
