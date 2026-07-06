@@ -32,11 +32,5 @@ CI автоматически блокирует любой PR который и
 - src/TorVps.Core/Services/Socks5Probe.cs
 - src/TorVps.Core/Services/WindowsProxyService.cs
 - src/TorVps.Core/Services/ProcessManager.cs
-
-<!--
-  ConfigCheckService.cs/IConfigCheckService.cs пока НЕ добавлены сюда: они созданы
-  в этом же PR, и CI-гард блокирует PR, который одновременно создаёт/меняет файл И
-  protect-ит его в DONE_MODULES.md. Добавить отдельным PR, который трогает только
-  этот файл, после мержа текущего.
--->
+- src/TorVps.Core/Services/ConfigCheckService.cs
 
