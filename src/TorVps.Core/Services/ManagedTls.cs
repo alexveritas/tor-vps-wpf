@@ -27,7 +27,10 @@ public static class ManagedTls
     /// <summary>Creates an HttpClient that tunnels every connection through a managed TLS 1.3 handshake.</summary>
     public static HttpClient CreateHttpClient()
     {
-        var handler = new SocketsHttpHandler { ConnectCallback = ConnectTlsAsync };
+        // UseProxy = false is load-bearing: with the Windows system proxy enabled (mihomo mixed port),
+        // SocketsHttpHandler would otherwise route the request to the proxy and hand ConnectCallback the
+        // proxy endpoint — and the TLS handshake against a plain HTTP proxy port fails (alert 40).
+        var handler = new SocketsHttpHandler { ConnectCallback = ConnectTlsAsync, UseProxy = false };
         return new HttpClient(handler, disposeHandler: true);
     }
 

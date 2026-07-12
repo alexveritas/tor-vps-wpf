@@ -18,4 +18,12 @@ public interface IMihomoService
 
     /// <summary>Pushes the on-disk mihomo.yaml to the running process via PUT /configs?force=true. Does not restart the process.</summary>
     Task<string> HotReloadRulesAsync(string baseDirectory, CancellationToken cancellationToken = default);
+
+    /// <summary>Reads which proxy a selector group currently routes to (GET /proxies/{group} → "now").
+    /// Returns null when the controller is unreachable or the group does not exist.</summary>
+    Task<string?> GetSelectedProxyAsync(string baseDirectory, string groupName, CancellationToken cancellationToken = default);
+
+    /// <summary>Switches a selector group to the given member proxy (PUT /proxies/{group}), live, without a restart.
+    /// The proxy must be listed in the group in mihomo.yaml. Returns false (and logs) on failure.</summary>
+    Task<bool> SelectProxyAsync(string baseDirectory, string groupName, string proxyName, CancellationToken cancellationToken = default);
 }

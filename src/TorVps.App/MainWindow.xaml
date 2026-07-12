@@ -2,7 +2,7 @@
     x:Class="TorVps.App.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="TorVps"
+    Title="Tor-xray-tun"
     Icon="tor_onion.ico"
     Width="452"
     Height="568"
@@ -34,7 +34,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <Ellipse Width="7" Height="7" Margin="0,0,8,0" Fill="{StaticResource AccentGreenBrush}" />
-                    <TextBlock x:Name="VersionText" Text="Tor-vps" FontSize="12" VerticalAlignment="Center" />
+                    <TextBlock x:Name="VersionText" Text="Tor-xray-tun" FontSize="12" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <Button Content="—" Style="{StaticResource WindowChromeButtonStyle}" Click="Minimize_Click" />
@@ -43,13 +43,17 @@
             </Grid>
         </Border>
 
-        <!-- Tor / mihomo toggles: top block, above the Main/Conf tabs; right-aligned -->
+        <!-- Graphic's / Tor / mihomo toggles: top block, above the Main/Conf tabs; right-aligned -->
         <Border Grid.Row="1" Style="{StaticResource PanelBorderStyle}" Height="38" Margin="0,4,0,0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0">
-                <TextBlock Text="Tor:" FontSize="11" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
+                <TextBlock Text="Graphic's:" FontSize="11" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <ToggleButton Style="{StaticResource BinaryToggleStyle}" IsChecked="{Binding GraphicsOn}" />
+                <TextBlock Text="Tor:" FontSize="11" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="14,0,6,0" />
                 <ToggleButton Style="{StaticResource BinaryToggleStyle}" IsChecked="{Binding TunnelOn, Mode=OneWay}" Command="{Binding ToggleTunnelCommand}" IsEnabled="{Binding TunnelToggleEnabled}" />
-                <TextBlock Text="mihomo:" FontSize="11" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="24,0,8,0" />
+                <TextBlock Text="mihomo:" FontSize="11" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="14,0,6,0" />
                 <ToggleButton Style="{StaticResource BinaryToggleStyle}" IsChecked="{Binding MihomoOn, Mode=OneWay}" Command="{Binding ToggleMihomoCommand}" IsEnabled="{Binding MihomoToggleEnabled}" />
+                <TextBlock Text="VPS-tunnel:" FontSize="11" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="14,0,6,0" />
+                <ToggleButton Style="{StaticResource BinaryToggleStyle}" IsChecked="{Binding VpsTunnelOn, Mode=OneWay}" Command="{Binding ToggleVpsTunnelCommand}" IsEnabled="{Binding VpsTunnelToggleEnabled}" />
             </StackPanel>
         </Border>
 
@@ -113,16 +117,34 @@
                             <Border Style="{StaticResource HealthChipBorderStyle}" Background="{Binding State, Converter={StaticResource HealthStateToBackgroundBrushConverter}}">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding Label}" FontSize="9" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" />
+                                    <!-- Plain value (hidden when a colored breakdown is present, e.g. the Bridges chip) -->
                                     <TextBlock Text="{Binding Text}" FontSize="9" Margin="4,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                               Visibility="{Binding Segments, Converter={StaticResource NullToVisibilityConverter}}"
                                                Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
+                                    <!-- Colored green/yellow/red breakdown (bridge availability) -->
+                                    <ItemsControl ItemsSource="{Binding Segments}" Margin="4,0,0,0" VerticalAlignment="Center" Focusable="False">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Text}" FontSize="9" Margin="0,0,3,0" VerticalAlignment="Center"
+                                                           Foreground="{Binding State, Converter={StaticResource HealthStateToForegroundBrushConverter}}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- 3. Bandwidth/ping graph: cropped to just fit the 3 value rows (down/up/ping) -->
-                <Border Grid.Row="2" Style="{StaticResource PanelBorderStyle}" Height="48" Margin="0,0,0,4" Padding="6,3">
+                <!-- 3. Bandwidth/ping graph: cropped to just fit the 3 value rows (down/up/ping).
+                       Shown only while "Graphic's:" is ON (otherwise the big VPS block below replaces both graphs). -->
+                <Border Grid.Row="2" Style="{StaticResource PanelBorderStyle}" Height="48" Margin="0,0,0,4" Padding="6,3"
+                        Visibility="{Binding GraphicsOn, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Grid>
                         <Viewbox Stretch="Fill">
                             <Canvas Width="520" Height="50" Background="Transparent" ClipToBounds="True">
@@ -170,7 +192,8 @@
                 <!-- 4. VPS metrics table (2 rows) + sparkline, mirroring the reference ServerGraphPanel:
                        VPS  CPU: {cpu}%   {downCur} ↓ {downPeak}
                             RAM: {ram}%   {upCur}   ↑ {upPeak}   | graph fills the rest -->
-                <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Height="44" Margin="0,0,0,4" Padding="8,4" ToolTip="{Binding ServerTooltip}">
+                <Border Grid.Row="3" Style="{StaticResource PanelBorderStyle}" Height="44" Margin="0,0,0,4" Padding="8,4"
+                        Visibility="{Binding GraphicsOn, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -223,6 +246,45 @@
                     </Grid>
                 </Border>
 
+                <!-- 3+4 ("Graphic's:" OFF): one block in place of both graphs — the same VPS numbers
+                       (CPU / RAM / net current+peak), scaled up to fill the whole block height. -->
+                <Border Grid.Row="2" Grid.RowSpan="2" Style="{StaticResource PanelBorderStyle}" Height="96" Margin="0,0,0,4" Padding="12,8"
+                        Visibility="{Binding GraphicsOn, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                    <Viewbox Stretch="Uniform">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="28" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="30" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="17" />
+                                <RowDefinition Height="17" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="VPS" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" />
+
+                            <!-- Row 1: CPU + download current/peak -->
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="CPU:" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource CpuSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding VpsCpuText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource CpuSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="0" Grid.Column="4" Text="{Binding VpsDownCurrentText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource DownSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="0" Grid.Column="5" Text="↓" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource DownSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="0" Grid.Column="6" Text="{Binding VpsDownPeakText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource DownSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+
+                            <!-- Row 2: RAM + upload current/peak -->
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="RAM:" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource MemSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding VpsRamText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource MemSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding VpsUpCurrentText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource UpSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="5" Text="↑" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource UpSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Grid.Column="6" Text="{Binding VpsUpPeakText, Mode=OneWay}" FontSize="9.5" FontWeight="SemiBold" Foreground="{StaticResource UpSeriesBrush}" TextAlignment="Right" VerticalAlignment="Center" />
+                        </Grid>
+                    </Viewbox>
+                </Border>
+
                 <!-- 5. Placeholder (reserved for future content) -->
                 <Border Grid.Row="4" Style="{StaticResource PanelBorderStyle}" Margin="0,0,0,4" />
 
@@ -232,8 +294,9 @@
                         <ItemsControl ItemsSource="{Binding LogLines}" Focusable="False">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
+                                    <!-- Colored by severity: dim = normal, yellow = warning, red = error -->
                                     <TextBlock Text="{Binding}" FontSize="9.5" LineHeight="15" LineStackingStrategy="BlockLineHeight"
-                                               Foreground="{StaticResource TextDimBrush}" TextWrapping="NoWrap" />
+                                               Foreground="{Binding Converter={StaticResource LogLineToForegroundBrushConverter}}" TextWrapping="NoWrap" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -243,7 +306,40 @@
 
             <!-- ===================== BRIDGES TAB ===================== -->
             <Grid Visibility="{Binding IsBridgesTab, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Border Style="{StaticResource PanelBorderStyle}" Padding="6,4,0,4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Availability summary accumulated while Tor is healthy + reload from file -->
+                <Border Grid.Row="0" Style="{StaticResource PanelBorderStyle}" Padding="8,5" Margin="0,0,0,4">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Availability" FontSize="10" Foreground="{StaticResource LabelBrightBrush}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                            <TextBlock FontSize="10" VerticalAlignment="Center" Margin="0,0,14,0">
+                                <Run Text="●" Foreground="#30D158" /><Run Text=" " /><Run Text="{Binding BridgeGreenCount, Mode=OneWay}" Foreground="#30D158" /><Run Text=" always" Foreground="{StaticResource TextDimBrush}" />
+                            </TextBlock>
+                            <TextBlock FontSize="10" VerticalAlignment="Center" Margin="0,0,14,0">
+                                <Run Text="●" Foreground="#FFD60A" /><Run Text=" " /><Run Text="{Binding BridgeYellowCount, Mode=OneWay}" Foreground="#FFD60A" /><Run Text=" flaky" Foreground="{StaticResource TextDimBrush}" />
+                            </TextBlock>
+                            <TextBlock FontSize="10" VerticalAlignment="Center" Margin="0,0,14,0">
+                                <Run Text="●" Foreground="#FF453A" /><Run Text=" " /><Run Text="{Binding BridgeRedCount, Mode=OneWay}" Foreground="#FF453A" /><Run Text=" down" Foreground="{StaticResource TextDimBrush}" />
+                            </TextBlock>
+                            <TextBlock FontSize="10" VerticalAlignment="Center">
+                                <Run Text="●" Foreground="#A1A1A8" /><Run Text=" " /><Run Text="{Binding BridgeGrayCount, Mode=OneWay}" Foreground="#A1A1A8" /><Run Text=" unused" Foreground="{StaticResource TextDimBrush}" />
+                            </TextBlock>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="Reload from bridges.txt" Style="{StaticResource ActionButtonFilledStyle}"
+                                Height="22" Padding="10,0" FontSize="10" VerticalAlignment="Center"
+                                Command="{Binding ReloadBridgesCommand}" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Style="{StaticResource PanelBorderStyle}" Padding="6,4,0,4">
                     <ScrollViewer Style="{StaticResource ThinScrollViewerStyle}" VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding Bridges}" Focusable="False">
                             <ItemsControl.ItemsPanel>
@@ -272,8 +368,10 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,10">
-                    <Button Content="проверить файлы конфигурации" Style="{StaticResource ActionButtonFilledStyle}"
-                            Command="{Binding RecheckConfigCommand}" Margin="0,0,8,0" />
+                    <!-- Configs are validated automatically on every (re)load; this forces an immediate re-read
+                         so cfg edits apply without restarting the app. -->
+                    <Button Content="Reload all conf" Style="{StaticResource ActionButtonFilledStyle}"
+                            Command="{Binding ReloadConfigCommand}" Margin="0,0,8,0" />
                     <Button Content="Update rules from mihomo.yaml" Style="{StaticResource ActionButtonFilledStyle}"
                             Command="{Binding UpdateRulesCommand}" />
                 </StackPanel>

@@ -59,7 +59,7 @@ public sealed class TorControlClient : ITorControlClient
         var bootstrap = progressMatch.Success && double.TryParse(progressMatch.Groups[1].Value, out var progress) ? progress : 0.0;
 
         var builtCircuits = BuiltPattern.Matches(response).Count;
-        var active = FingerprintPattern.Matches(response).Select(m => m.Groups[1].Value.ToUpperInvariant()).ToArray();
+        var (upGuards, downGuards) = ParseEntryGuards(response);
 
         var readMatch = TrafficReadPattern.Match(response);
         var readBytes = readMatch.Success && ulong.TryParse(readMatch.Groups[1].Value, out var rd) ? rd : (ulong?)null;
@@ -73,12 +73,71 @@ public sealed class TorControlClient : ITorControlClient
             ControlAuthOk = controlOk,
             BootstrapPercent = bootstrap,
             BuiltCircuits = builtCircuits,
-            ActiveGuardFingerprints = active,
+            ActiveGuardFingerprints = upGuards,
+            DownGuardFingerprints = downGuards,
             TrafficReadBytes = readBytes,
             TrafficWrittenBytes = writtenBytes,
             DownMbit = downMbit,
             UpMbit = upMbit,
         };
+    }
+
+    /// <summary>
+    /// Parses the GETINFO entry-guards block into fingerprints Tor currently reaches (status <c>up</c>) versus
+    /// tried-but-unreachable (<c>down</c>/<c>unusable</c>). Guards Tor has never connected to end up in neither list.
+    /// Crucially the status word is honoured — every configured bridge appears here regardless of reachability, so
+    /// matching bare fingerprints would mark them all as reachable.
+    /// </summary>
+    public static (IReadOnlyList<string> Up, IReadOnlyList<string> Down) ParseEntryGuards(string response)
+    {
+        var up = new List<string>();
+        var down = new List<string>();
+        var inBlock = false;
+
+        foreach (var raw in response.Split('\n'))
+        {
+            var line = raw.TrimEnd('\r');
+            if (!inBlock)
+            {
+                if (line.StartsWith("250+entry-guards=", StringComparison.Ordinal) || line.StartsWith("250-entry-guards=", StringComparison.Ordinal))
+                    inBlock = true;
+                continue;
+            }
+            if (line == ".")
+                break;
+
+            var fingerprintMatch = FingerprintPattern.Match(line);
+            if (!fingerprintMatch.Success)
+                continue;
+            var fingerprint = fingerprintMatch.Groups[1].Value.ToUpperInvariant();
+
+            // Line shape: "$FINGERPRINT[~nickname] <status> [<timestamp>]" — status is the second token.
+            var tokens = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var status = tokens.Length >= 2 ? tokens[1].ToLowerInvariant() : string.Empty;
+            if (status == "up")
+                up.Add(fingerprint);
+            else if (status is "down" or "unusable")
+                down.Add(fingerprint);
+        }
+
+        return (up, down);
+    }
+
+    public async Task<bool> SendNewnymAsync(string controlHost, int controlPort, string cookieFilePath, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await QueryAsync(controlHost, controlPort, cookieFilePath, ["SIGNAL NEWNYM"], cancellationToken).ConfigureAwait(false);
+            return response.Contains("250 OK", StringComparison.Ordinal);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     private (double DownMbit, double UpMbit) UpdateTrafficRate(ulong? readBytes, ulong? writtenBytes)

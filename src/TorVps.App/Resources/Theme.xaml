@@ -130,9 +130,19 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,1,1,0" CornerRadius="10,10,0,0">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
-                    </Border>
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,1,1,0" CornerRadius="10,10,0,0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <!-- Content-separator line across the tab bottom: shown for inactive tabs (they tuck under it),
+                             hidden for the active tab (Tag=Active) so it breaks through and joins the content. -->
+                        <Border x:Name="BottomLine" Height="1" VerticalAlignment="Bottom" Background="{StaticResource TabSeparatorBrush}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Tag" Value="Active">
+                            <Setter TargetName="BottomLine" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -144,6 +154,7 @@
                 <Setter Property="Background" Value="{StaticResource TabActiveSurfaceBrush}" />
                 <Setter Property="BorderBrush" Value="{StaticResource TabActiveBorderBrush}" />
                 <Setter Property="Foreground" Value="White" />
+                <Setter Property="Tag" Value="Active" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -154,6 +165,7 @@
                 <Setter Property="Background" Value="{StaticResource TabActiveSurfaceBrush}" />
                 <Setter Property="BorderBrush" Value="{StaticResource TabActiveBorderBrush}" />
                 <Setter Property="Foreground" Value="White" />
+                <Setter Property="Tag" Value="Active" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -164,6 +176,7 @@
                 <Setter Property="Background" Value="{StaticResource TabActiveSurfaceBrush}" />
                 <Setter Property="BorderBrush" Value="{StaticResource TabActiveBorderBrush}" />
                 <Setter Property="Foreground" Value="White" />
+                <Setter Property="Tag" Value="Active" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -232,30 +245,35 @@
     </Style>
 
     <!-- Filled (green) pill action button -->
+    <!-- Filled action button: muted block-green matching the toggles' "on" track, not the old bright green -->
     <Style x:Key="ActionButtonFilledStyle" TargetType="Button">
         <Setter Property="Height" Value="30" />
         <Setter Property="Padding" Value="14,0" />
         <Setter Property="FontSize" Value="11" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Foreground" Value="{StaticResource OnDarkTextBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bg" CornerRadius="{StaticResource RadiusSmall}" Padding="{TemplateBinding Padding}">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Color="#39DF67" Offset="0" />
-                                <GradientStop Color="#30D158" Offset="1" />
-                            </LinearGradientBrush>
-                        </Border.Background>
+                    <Border x:Name="Bg" CornerRadius="{StaticResource RadiusSmall}"
+                            Background="{StaticResource ToggleOnTrackBrush}"
+                            BorderBrush="#6630D158" BorderThickness="1"
+                            Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Opacity" Value="0.9" />
+                            <Setter TargetName="Bg" Property="Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#9930D158" Offset="0" />
+                                        <GradientStop Color="#6630D158" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Bg" Property="Opacity" Value="0.55" />
+                            <Setter TargetName="Bg" Property="Opacity" Value="0.5" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

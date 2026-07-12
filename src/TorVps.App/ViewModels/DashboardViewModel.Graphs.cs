@@ -35,10 +35,6 @@ public partial class DashboardViewModel
         while (_vpsHistory.Count > VpsGraphCapacity)
             _vpsHistory.Dequeue();
 
-        ServerTooltip = Server.Ok
-            ? "Glances API OK" + (string.IsNullOrEmpty(Server.Iface) ? string.Empty : $" / {Server.Iface}")
-            : string.IsNullOrEmpty(Server.Error) ? "server metrics unavailable" : Server.Error;
-
         UpdateGraphPointCollections();
     }
 
@@ -54,12 +50,17 @@ public partial class DashboardViewModel
         if (pingValues.Length > 0)
             _pingScaleMax = NextStableScale(_pingScaleMax, pingValues.Max(), 250.0);
 
-        DownAreaPoints = BuildPoints(points, p => p.Down, _speedScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
-        UpAreaPoints = BuildPoints(points, p => p.Up, _speedScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
-        PingAreaPoints = BuildPoints(points, p => p.Ping, _pingScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
-        DownFillPoints = ToAreaPolygon(DownAreaPoints, TopGraphLogicalHeight);
-        UpFillPoints = ToAreaPolygon(UpAreaPoints, TopGraphLogicalHeight);
-        PingFillPoints = ToAreaPolygon(PingAreaPoints, TopGraphLogicalHeight);
+        // Graphic's OFF hides both graph panels — skip the geometry building (the expensive part) but keep
+        // every text value fresh: the big VPS block reuses them and toggling back must not show stale numbers.
+        if (GraphicsOn)
+        {
+            DownAreaPoints = BuildPoints(points, p => p.Down, _speedScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
+            UpAreaPoints = BuildPoints(points, p => p.Up, _speedScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
+            PingAreaPoints = BuildPoints(points, p => p.Ping, _pingScaleMax, GraphHistoryCapacity, TopGraphLogicalHeight);
+            DownFillPoints = ToAreaPolygon(DownAreaPoints, TopGraphLogicalHeight);
+            UpFillPoints = ToAreaPolygon(UpAreaPoints, TopGraphLogicalHeight);
+            PingFillPoints = ToAreaPolygon(PingAreaPoints, TopGraphLogicalHeight);
+        }
 
         var lastValid = validPoints.LastOrDefault();
         DownCurrentText = FormatSpeed(lastValid?.Down ?? 0);
@@ -78,10 +79,13 @@ public partial class DashboardViewModel
         var observedVpsSpeed = validVps.Length > 0 ? validVps.Max(p => Math.Max(p.Down, p.Up)) : 1.0;
         _vpsScaleMax = NextStableScale(_vpsScaleMax, observedVpsSpeed, 1.0);
 
-        VpsDownAreaPoints = BuildPoints(vpsPoints, p => p.Down, _vpsScaleMax, VpsGraphCapacity, VpsGraphLogicalHeight);
-        VpsUpAreaPoints = BuildPoints(vpsPoints, p => p.Up, _vpsScaleMax, VpsGraphCapacity, VpsGraphLogicalHeight);
-        VpsDownFillPoints = ToAreaPolygon(VpsDownAreaPoints, VpsGraphLogicalHeight);
-        VpsUpFillPoints = ToAreaPolygon(VpsUpAreaPoints, VpsGraphLogicalHeight);
+        if (GraphicsOn)
+        {
+            VpsDownAreaPoints = BuildPoints(vpsPoints, p => p.Down, _vpsScaleMax, VpsGraphCapacity, VpsGraphLogicalHeight);
+            VpsUpAreaPoints = BuildPoints(vpsPoints, p => p.Up, _vpsScaleMax, VpsGraphCapacity, VpsGraphLogicalHeight);
+            VpsDownFillPoints = ToAreaPolygon(VpsDownAreaPoints, VpsGraphLogicalHeight);
+            VpsUpFillPoints = ToAreaPolygon(VpsUpAreaPoints, VpsGraphLogicalHeight);
+        }
 
         var lastValidVps = validVps.LastOrDefault();
         VpsCpuText = $"{Math.Round(lastValidVps?.Cpu ?? 0)}%";

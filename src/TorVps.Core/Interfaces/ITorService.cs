@@ -15,4 +15,11 @@ public interface ITorService
     /// Never throws; mihomo/proxy shutdown failures are logged and do not prevent Tor from stopping.
     /// </summary>
     Task StopAsync(string baseDirectory, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Bounces only tor.exe/lyrebird.exe; mihomo and the system proxy stay up (mihomo fails closed while its
+    /// upstream SOCKS is gone and reconnects once Tor is back). Used by the watchdog's L2/L3 rungs. The caller
+    /// is responsible for waiting for bootstrap before relying on the new Tor instance.
+    /// </summary>
+    Task<string> RestartTorOnlyAsync(string baseDirectory, CancellationToken cancellationToken = default);
 }

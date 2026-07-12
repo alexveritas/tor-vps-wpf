@@ -11,7 +11,10 @@
 
             <converters:HealthStateToBackgroundBrushConverter x:Key="HealthStateToBackgroundBrushConverter" />
             <converters:HealthStateToForegroundBrushConverter x:Key="HealthStateToForegroundBrushConverter" />
+            <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <converters:LogLineToForegroundBrushConverter x:Key="LogLineToForegroundBrushConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

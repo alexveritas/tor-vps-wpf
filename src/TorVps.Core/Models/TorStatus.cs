@@ -9,7 +9,11 @@ public sealed record TorStatus
     public bool ControlAuthOk { get; init; }
     public double BootstrapPercent { get; init; }
     public int BuiltCircuits { get; init; }
+    /// <summary>Bridge/guard fingerprints Tor currently reaches (entry-guards status "up").</summary>
     public IReadOnlyList<string> ActiveGuardFingerprints { get; init; } = Array.Empty<string>();
+
+    /// <summary>Bridge/guard fingerprints Tor tried but can't reach (entry-guards status "down"/"unusable").</summary>
+    public IReadOnlyList<string> DownGuardFingerprints { get; init; } = Array.Empty<string>();
     public ulong? TrafficReadBytes { get; init; }
     public ulong? TrafficWrittenBytes { get; init; }
     public double DownMbit { get; init; }
