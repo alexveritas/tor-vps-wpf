@@ -24,6 +24,8 @@ public partial class App : Application
         services.AddSingleton<ISocks5Probe, Socks5Probe>();
         services.AddSingleton<ITorControlClient, TorControlClient>();
         services.AddSingleton<IBridgeAvailabilityMonitor, BridgeAvailabilityMonitor>();
+        services.AddSingleton<IExitIpProbe, ExitIpProbe>();
+        services.AddSingleton<TunnelWatchdog>();
         // The Glances endpoint is TLS 1.3-only; give the monitor its own managed-TLS client (Win10 Schannel can't do TLS 1.3).
         services.AddSingleton<IVpsMonitorService>(_ => new VpsMonitorService(ManagedTls.CreateHttpClient()));
         services.AddSingleton<IMihomoService, MihomoService>();
@@ -39,6 +41,15 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        try
+        {
+            // Persist bridge availability counters so yellow/red stats survive restarts.
+            _serviceProvider?.GetService<DashboardViewModel>()?.FlushBridgeStats();
+        }
+        catch (Exception)
+        {
+            // Best-effort on shutdown.
+        }
         _serviceProvider?.Dispose();
         base.OnExit(e);
     }

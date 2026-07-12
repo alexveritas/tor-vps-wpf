@@ -1,4 +1,6 @@
+using TorVps.Core.Config;
 using TorVps.Core.Models;
+using TorVps.Core.Services;
 
 namespace TorVps.App.ViewModels;
 
@@ -13,6 +15,7 @@ public partial class DashboardViewModel
         bool mihomoAlive,
         BridgeAvailabilityReport bridgeReport,
         AppConfig config,
+        TunnelWatchdogConfig watchdogConfig,
         IReadOnlyList<string> logLines)
     {
         var torState = torAlive && bootstrap >= 100.0 && (controlStatus.ControlAuthOk || ctrlPortOpen)
@@ -26,15 +29,17 @@ public partial class DashboardViewModel
         var mihomoText = mihomoAlive ? "online" : "stopped";
 
         var (chainState, chainText) = mihomoAlive ? Pcard(_chainProbe) : (HealthState.Warn, "mihomo off");
-        var (facebookState, facebookText) = Pcard(_facebookProbe);
-        var (onionState, onionText) = Pcard(_onionProbe);
+        var (torInetState, torInetText) = TorInetCard(_torExitResult, _providerIp, watchdogConfig.TorInetWarnMs, watchdogConfig.TorInetErrorMs);
+        var (onionState, onionText) = VpsTunnelOn
+            ? OnionVpsCard(_exitIpResult, _onionProbe, watchdogConfig.SlowPingMs)
+            : (HealthState.Unknown, "off"); // VPS-tunnel toggle OFF: traffic exits via plain Tor
 
         ReplaceAll(Cards, new[]
         {
             new CardState { Title = "Tor", State = torState, Text = torText },
             new CardState { Title = "mihomo", State = mihomoState, Text = mihomoText },
             new CardState { Title = "Chain", State = chainState, Text = chainText },
-            new CardState { Title = "Tor → i-net", State = facebookState, Text = facebookText },
+            new CardState { Title = "Tor → i-net", State = torInetState, Text = torInetText },
             new CardState { Title = "Onion VPS", State = onionState, Text = onionText },
         });
 
@@ -88,10 +93,12 @@ public partial class DashboardViewModel
             new HealthChip
             {
                 Label = "Bridges",
-                State = bridgeReport.RedCount > 0 ? HealthState.Error
-                    : bridgeReport.YellowCount > 0 ? HealthState.Warn
-                    : bridgeReport.GreenCount > 0 ? HealthState.Ok
-                    : config.BridgeCount > 0 ? HealthState.Warn : HealthState.Error,
+                // Colored by how many GREEN bridges remain: ≥6 ok, 3–5 warn, 0–2 error; gray until any bridge
+                // has been classified at all (fresh start / Tor still warming up).
+                State = bridgeReport.GreenCount + bridgeReport.YellowCount + bridgeReport.RedCount == 0 ? HealthState.Unknown
+                    : bridgeReport.GreenCount >= 6 ? HealthState.Ok
+                    : bridgeReport.GreenCount >= 3 ? HealthState.Warn
+                    : HealthState.Error,
                 Text = $"{bridgeReport.GreenCount}/{bridgeReport.YellowCount}/{bridgeReport.RedCount}",
                 Segments = new[]
                 {
@@ -103,8 +110,16 @@ public partial class DashboardViewModel
             new HealthChip
             {
                 Label = "Watchdog",
-                State = onionMs > 2500 || (mihomoAlive && chainMs > 2500) ? HealthState.Warn : HealthState.Ok,
-                Text = ping > 2500 ? "slow" : "OK",
+                State = !VpsTunnelOn ? HealthState.Unknown
+                    : _tunnelWatchdog.InBackoff(DateTimeOffset.UtcNow) ? HealthState.Error
+                    : _exitIpResult is { Success: false } ? HealthState.Warn
+                    : onionMs > watchdogConfig.SlowPingMs || (mihomoAlive && chainMs > watchdogConfig.SlowPingMs) ? HealthState.Warn
+                    : HealthState.Ok,
+                Text = !VpsTunnelOn ? "off"
+                    : _tunnelWatchdog.InBackoff(DateTimeOffset.UtcNow) ? "backoff"
+                    : _exitIpResult is { Success: false } ? (watchdogConfig.SelfHealEnabled ? "healing" : "FAIL")
+                    : ping > watchdogConfig.SlowPingMs ? "slow"
+                    : watchdogConfig.SelfHealEnabled ? "OK" : "watch",
             },
             new HealthChip
             {
@@ -131,6 +146,46 @@ public partial class DashboardViewModel
         if (probe is null || !probe.Success)
             return (HealthState.Unknown, "—");
         return Lat(probe.ElapsedMs, probe.CheckedAt);
+    }
+
+    /// <summary>
+    /// "Tor → i-net": we fetch our exit IP through raw Tor and want anything except the address our provider hands
+    /// us directly. Only the COLOUR uses the new leak/latency logic — red on a leak (exit == ISP IP), unreachable,
+    /// or a fetch slower than the error threshold; yellow over the warn threshold; green otherwise. The DISPLAY is
+    /// unchanged from before: the exit round-trip (ping) and the time since that measurement, refreshed each probe
+    /// cycle. (The observed IP and exact ms are logged.)
+    /// </summary>
+    private static (HealthState State, string Text) TorInetCard(ExitIpResult? exit, string providerIp, int warnMs, int errorMs)
+    {
+        if (exit is null)
+            return (HealthState.Unknown, "—"); // not probed yet
+
+        var latency = $"{Math.Round(exit.ElapsedMs)} ms · {Age(exit.CheckedAt)}";
+        return ExitIpAssessment.Assess(exit.Reachable, exit.ObservedIp, providerIp, exit.ElapsedMs, warnMs, errorMs) switch
+        {
+            ExitIpVerdict.Down => (HealthState.Error, "down"),
+            ExitIpVerdict.Leak => (HealthState.Error, "leak!"),
+            ExitIpVerdict.TooSlow => (HealthState.Error, latency),
+            ExitIpVerdict.Slow => (HealthState.Warn, latency),
+            _ => (HealthState.Ok, latency),
+        };
+    }
+
+    /// <summary>
+    /// Onion-VPS color is driven by liveness (does traffic exit via our VPS?), not raw latency: red when the exit is
+    /// wrong/unreachable, else green/yellow by the onion round-trip against slow_ping_ms. The shown ms is the pure
+    /// tunnel RTT (a healthy Tor onion tunnel is inherently ~0.5–3s).
+    /// </summary>
+    private static (HealthState State, string Text) OnionVpsCard(ExitIpResult? exit, ProbeResult? onion, int slowPingMs)
+    {
+        if (exit is null)
+            return (HealthState.Unknown, "—"); // not checked yet
+        if (!exit.Success)
+            return (HealthState.Error, exit.Reachable ? "wrong exit" : "down");
+
+        var rttMs = onion?.Success == true ? onion.ElapsedMs : exit.ElapsedMs;
+        var text = $"{Math.Round(rttMs)} ms · {Age(exit.CheckedAt)}";
+        return (rttMs <= slowPingMs ? HealthState.Ok : HealthState.Warn, text);
     }
 
     private static (HealthState State, string Text) Lat(double elapsedMs, DateTimeOffset checkedAt)

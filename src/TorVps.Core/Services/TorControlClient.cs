@@ -123,6 +123,23 @@ public sealed class TorControlClient : ITorControlClient
         return (up, down);
     }
 
+    public async Task<bool> SendNewnymAsync(string controlHost, int controlPort, string cookieFilePath, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await QueryAsync(controlHost, controlPort, cookieFilePath, ["SIGNAL NEWNYM"], cancellationToken).ConfigureAwait(false);
+            return response.Contains("250 OK", StringComparison.Ordinal);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     private (double DownMbit, double UpMbit) UpdateTrafficRate(ulong? readBytes, ulong? writtenBytes)
     {
         if (readBytes is null || writtenBytes is null)

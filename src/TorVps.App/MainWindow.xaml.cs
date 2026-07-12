@@ -15,8 +15,8 @@ public partial class MainWindow : Window
         viewModel.StartMonitoring();
 
         var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "dev";
-        Title = $"TorVps v{version}";
-        VersionText.Text = $"Tor-vps v{version}";
+        Title = $"Tor-xray-tun v{version}";
+        VersionText.Text = $"Tor-xray-tun v{version}";
 
         viewModel.LogLines.CollectionChanged += (_, _) =>
             Dispatcher.BeginInvoke(() => LogScrollViewer.ScrollToEnd(), DispatcherPriority.Background);

@@ -49,6 +49,19 @@ public sealed class TorService : ITorService
         return $"started pid={pid}";
     }
 
+    public async Task<string> RestartTorOnlyAsync(string baseDirectory, CancellationToken cancellationToken = default)
+    {
+        // Watchdog L2/L3: mihomo is intentionally NOT stopped — it fails closed against the dead SOCKS port and
+        // picks the new Tor up automatically, so the system proxy/TUN never flaps during the heal.
+        _logService.Append(baseDirectory, LogLevel.Warn, "TOR-only restart requested (mihomo kept running)");
+        await _processManager.StopAsync(TorSlotKey, baseDirectory, "tor", cancellationToken).ConfigureAwait(false);
+        await _processManager.KillByImageNameAsync("tor.exe", cancellationToken).ConfigureAwait(false);
+        await _processManager.KillByImageNameAsync("lyrebird.exe", cancellationToken).ConfigureAwait(false);
+
+        // StartedAt is deliberately left set: StartAsync counts this as a restart (uptime chip shows rN).
+        return await StartAsync(baseDirectory, cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task StopAsync(string baseDirectory, CancellationToken cancellationToken = default)
     {
         // Domain rule: mihomo (+ system proxy) must be stopped and verified before Tor/lyrebird, never the other way around.

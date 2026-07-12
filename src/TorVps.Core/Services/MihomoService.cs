@@ -18,6 +18,7 @@ public sealed class MihomoService : IMihomoService
     private static readonly TimeSpan StartReadyTimeout = TimeSpan.FromMilliseconds(6000);
     private static readonly TimeSpan StopPortsClosedTimeout = TimeSpan.FromMilliseconds(6000);
     private static readonly TimeSpan HotReloadHttpTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan SelectorHttpTimeout = TimeSpan.FromMilliseconds(1500);
 
     private readonly IProcessManager _processManager;
     private readonly ILogService _logService;
@@ -129,6 +130,75 @@ public sealed class MihomoService : IMihomoService
             _logService.Append(baseDirectory, LogLevel.Warn, $"MIHOMO RULES HOT UPDATE FAILED: mihomo not restarted; {ex.Message}");
             return $"not applied; mihomo was not restarted: {ex.Message}";
         }
+    }
+
+    public async Task<string?> GetSelectedProxyAsync(string baseDirectory, string groupName, CancellationToken cancellationToken = default)
+    {
+        var config = ConfigParser.ParseAppConfig(baseDirectory);
+        var controllerHost = NormalizeControllerHost(config.ControllerHost);
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"http://{controllerHost}:{config.ControllerPort}/proxies/{Uri.EscapeDataString(groupName)}");
+            AddControllerAuth(request, config);
+
+            using var timeoutCts = new CancellationTokenSource(SelectorHttpTimeout);
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+            using var response = await _httpClient.SendAsync(request, linkedCts.Token).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var body = await response.Content.ReadAsStringAsync(linkedCts.Token).ConfigureAwait(false);
+            using var doc = JsonDocument.Parse(body);
+            return doc.RootElement.TryGetProperty("now", out var now) ? now.GetString() : null;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public async Task<bool> SelectProxyAsync(string baseDirectory, string groupName, string proxyName, CancellationToken cancellationToken = default)
+    {
+        var config = ConfigParser.ParseAppConfig(baseDirectory);
+        var controllerHost = NormalizeControllerHost(config.ControllerHost);
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Put, $"http://{controllerHost}:{config.ControllerPort}/proxies/{Uri.EscapeDataString(groupName)}");
+            AddControllerAuth(request, config);
+            request.Content = new StringContent(JsonSerializer.Serialize(new { name = proxyName }), Encoding.UTF8, "application/json");
+
+            using var timeoutCts = new CancellationTokenSource(SelectorHttpTimeout);
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+            using var response = await _httpClient.SendAsync(request, linkedCts.Token).ConfigureAwait(false);
+            if (response.IsSuccessStatusCode)
+            {
+                _logService.Append(baseDirectory, LogLevel.Info, $"MIHOMO selector: {groupName} → {proxyName}");
+                return true;
+            }
+
+            var body = await response.Content.ReadAsStringAsync(linkedCts.Token).ConfigureAwait(false);
+            _logService.Append(baseDirectory, LogLevel.Warn, $"MIHOMO selector FAILED: {groupName} → {proxyName}; HTTP {(int)response.StatusCode} {Truncate(body, 200)} (is {proxyName} listed in the group in mihomo.yaml?)");
+            return false;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logService.Append(baseDirectory, LogLevel.Warn, $"MIHOMO selector FAILED: {groupName} → {proxyName}; {ex.Message}");
+            return false;
+        }
+    }
+
+    private static void AddControllerAuth(HttpRequestMessage request, AppConfig config)
+    {
+        if (!string.IsNullOrWhiteSpace(config.Secret))
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", config.Secret.Trim());
     }
 
     private async Task<string> PutConfigsReloadAsync(string controllerHost, AppConfig config, CancellationToken cancellationToken)

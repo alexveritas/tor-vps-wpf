@@ -8,6 +8,10 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>TorVps</AssemblyName>
     <RootNamespace>TorVps.App</RootNamespace>
+    <!-- Display name (titlebar / file properties). The exe stays TorVps.exe so existing
+         shortcuts and deploy paths keep working; rename it later in one deliberate step. -->
+    <Product>Tor-xray-tun</Product>
+    <AssemblyTitle>Tor-xray-tun</AssemblyTitle>
     <ApplicationIcon>tor_onion.ico</ApplicationIcon>
     <Version>0.34.0</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>

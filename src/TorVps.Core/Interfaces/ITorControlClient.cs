@@ -16,4 +16,7 @@ public interface ITorControlClient
     /// state. Returns a default (unreachable) status if the control port cannot be reached.
     /// </summary>
     Task<TorStatus> GetStatusAsync(string controlHost, int controlPort, string cookieFilePath, CancellationToken cancellationToken = default);
+
+    /// <summary>Sends SIGNAL NEWNYM to request fresh Tor circuits. Returns true if Tor acknowledged with 250 OK.</summary>
+    Task<bool> SendNewnymAsync(string controlHost, int controlPort, string cookieFilePath, CancellationToken cancellationToken = default);
 }
